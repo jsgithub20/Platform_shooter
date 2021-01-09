@@ -1,12 +1,11 @@
-# network tutorial
-
 import pygame
+import json
 from network import Network
 
 width = 500
 height = 500
 win = pygame.display.set_mode((width, height))
-pygame.display.set_caption("Client")
+# pygame.display.set_caption("Client")
 
 clientNumber = 0
 
@@ -65,23 +64,29 @@ def main():
     run = True
     n = Network()
     # startPos = str_pos(n.getPos())
-    p = Player(100,100,100,100,(0,255,0))
-    p2 = Player(0,0,100,100,(255,0,0))
+    if n.player_role == "shooter":
+        pygame.display.set_caption("Shooter_client: Red")
+        me = Player(0,0,100,100,(255,0,0))
+        they = Player(250,250,100,100,(0,255,0))
+    elif n.player_role == "chopper":
+        pygame.display.set_caption("Chopper_client: Green")
+        me = Player(250,250,100,100,(0,255,0))
+        they = Player(0,0,100,100,(255,0,0))
     clock = pygame.time.Clock()
 
     while run:
         clock.tick(60)
-        p2Pos = str_pos(n.send(pos_str((p.x, p.y))))
-        p2.x = p2Pos[0]
-        p2.y = p2Pos[1]
-        p2.update()
+        they_pos = str_pos(n.send(pos_str((me.x, me.y))))
+        they.x = they_pos[0]
+        they.y = they_pos[1]
+        they.update()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 pygame.quit()
 
-        p.move()
-        redrawWindow(win, p, p2)
+        me.move()
+        redrawWindow(win, me, they)
 
 main()

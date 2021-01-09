@@ -1,4 +1,4 @@
-import socket
+import socket, json
 from threading import Thread
 
 server = socket.gethostbyname(socket.gethostname())
@@ -22,15 +22,32 @@ def str_pos(str):
 def pos_str(tup):
     return str(tup[0]) + "," + str(tup[1])
 
-pos = [(0,0),(100,100)]
+def lst_del_item(list, del_item):
+    for item in list:
+        if item == del_item:
+            list.remove(item)
+    return list
+
+def all_keys(dict):
+    key_list = []
+    for key in dict.keys():
+        key_list.append(key)
+    return key_list
+
+pos = [(0, 0), (100, 100)]
+player_opt = {"shooter": (0, 0), "chopper": (250, 250)}
 
 def threaded_client(conn, player, addr):
-    # conn.send(str.encode(pos_str(pos[player])))
+    conn.sendall(json.dumps(player_opt).encode())
+    # conn.sendall(",".join(all_keys(player_opt)).encode())
+    player_selection = conn.recv(1024).decode()
+    player_opt[player_selection] = "Not Available"
+    # print(player_selection)
     reply = ""
     connected = True
     while connected:
         try:
-            data = str_pos(conn.recv(2048).decode())
+            data = str_pos(conn.recv(1024).decode())
             pos[player] = data
 
             if not data:
