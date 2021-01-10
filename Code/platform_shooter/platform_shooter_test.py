@@ -33,6 +33,22 @@ BLUE = (0, 0, 255)
 SCREEN_WIDTH = 1024
 SCREEN_HEIGHT = 768
 
+class DrawText:
+    def __init__(self, screen, size, color, x, y):
+        self.screen = screen
+        self.size = size
+        self.color = color
+        self.x = x
+        self.y = y
+        self.font = pygame.font.Font("resources/You Blockhead.ttf", self.size)
+        # self.font = pg.font.SysFont(None, self.size)
+
+    def draw(self, text):
+        text_surface = self.font.render(text, True, self.color)
+        text_rect = text_surface.get_rect()
+        text_rect.midtop = (self.x, self.y)
+        self.screen.blit(text_surface, text_rect)
+
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, direction, screen_width):
@@ -325,6 +341,14 @@ def main():
 
     active_sprite_list.add(player_shooter, player_chopper)
 
+    name_input = DrawText(screen, 30, WHITE, 100, 100)
+    server_input = DrawText(screen, 30, WHITE, 150, 150)
+    port_input = DrawText(screen, 30, WHITE, 200, 200)
+
+    name_str = ""
+    server_str = ""
+    port_str = ""
+
     # Loop until the user clicks the close button.
     done = False
 
@@ -338,6 +362,8 @@ def main():
                 done = True
 
             if event.type == pygame.KEYDOWN:
+                if 32 <= event.key <= 126:
+                    print(event.unicode + ":" + str(event.key))
                 # player_shooter controls
                 if event.key == pygame.K_LEFT:
                     player_shooter.go_left()
