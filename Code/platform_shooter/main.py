@@ -17,6 +17,9 @@ class Game:
         self.running = True
 
     def new(self):
+        # fps display
+        self.fps_txt = DrawText(self.screen, 10, WHITE, 25, 0)
+
         # start a new game
         self.bullets = []
 
@@ -123,7 +126,6 @@ class Game:
                     self.player_chopper.stop()
 
     def update(self):
-        print(self.clock.get_fps())
         # Game Loop - Update
         # Update the player.
         self.active_sprite_list.update()
@@ -169,12 +171,38 @@ class Game:
                                                                          self.player_chopper.hit_limit))
         self.player_shooter.score_text.draw("Shooter Hit: {}/{}".format(self.player_shooter.hit_count,
                                                                          self.player_shooter.hit_limit))
+        self.fps_txt.draw("fps: {}".format(str(int(self.clock.get_fps()))))
         # *after* drawing everything, flip the display
         pg.display.flip()
 
     def show_start_screen(self):
         # game splash/start screen
-        pass
+        background = pg.image.load("resources/gui/Window_06.png").convert_alpha()
+        title = DrawText(self.screen, 50, GREEN, 350, 25)
+        name = DrawText(self.screen, 40, WHITE, 200, 300)
+        server_IP = DrawText(self.screen, 40, WHITE, 200, 350)
+        server_Port = DrawText(self.screen, 40, WHITE, 200, 400)
+        settings_btn = Buttons("resources/gui/settings.png", 100, 500)
+        start_btn = Buttons("resources/gui/right.png", 400, 500)
+        credit_btn = Buttons("resources/gui/credit.png", 700, 500)
+        btn_sprites = pg.sprite.Group()
+        btn_sprites.add(settings_btn, start_btn, credit_btn)
+        waiting = True
+        while waiting:
+            self.clock.tick(FPS)
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    waiting = False
+                    self.running = False
+                if event.type == pg.KEYUP:
+                    waiting = False
+            self.screen.blit(background, (0, 0))
+            btn_sprites.draw(self.screen)
+            title.draw("My Game")
+            name.draw("Name: ")
+            server_IP.draw("Server IP: ")
+            server_Port.draw("Server Port: ")
+            pg.display.flip()
 
     def show_go_screen(self):
         # game over/continue

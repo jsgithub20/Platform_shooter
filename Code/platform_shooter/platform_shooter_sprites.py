@@ -33,6 +33,15 @@ long_block.blit(blocks[1], (70, 0))
 long_block.blit(blocks[2], (140, 0))
 
 
+class Buttons(pg.sprite.Sprite):
+    def __init__(self, file, pos_x, pos_y):
+        pg.sprite.Sprite.__init__(self)
+        self.image = pg.image.load(file).convert_alpha()
+        self.rect = self.image.get_rect()
+        self.rect.x = pos_x
+        self.rect.y = pos_y
+
+
 class DrawText:
     def __init__(self, screen, size, color, x, y):
         self.screen = screen
@@ -46,7 +55,7 @@ class DrawText:
     def draw(self, text):
         text_surface = self.font.render(text, True, self.color)
         text_rect = text_surface.get_rect()
-        text_rect.midtop = (self.x, self.y)
+        text_rect.x, text_rect.y = (self.x, self.y)
         self.screen.blit(text_surface, text_rect)
 
 
