@@ -40,6 +40,11 @@ class Buttons(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = pos_x
         self.rect.y = pos_y
+        self.btn_clicked = 0
+
+    def update(self, pos_xy):
+        if self.rect.collidepoint(pos_xy):
+            self.btn_clicked = 1
 
 
 class DrawText:

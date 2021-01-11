@@ -194,8 +194,11 @@ class Game:
                 if event.type == pg.QUIT:
                     waiting = False
                     self.running = False
-                if event.type == pg.KEYUP:
-                    waiting = False
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    btn_sprites.update(pg.mouse.get_pos())
+                    for button in btn_sprites:
+                        pass
+
             self.screen.blit(background, (0, 0))
             btn_sprites.draw(self.screen)
             title.draw("My Game")
