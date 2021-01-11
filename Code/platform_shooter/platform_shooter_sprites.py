@@ -34,34 +34,74 @@ long_block.blit(blocks[2], (140, 0))
 
 
 class Buttons(pg.sprite.Sprite):
-    def __init__(self, file, pos_x, pos_y):
+    def __init__(self, file, pos_x, pos_y, name):
         pg.sprite.Sprite.__init__(self)
         self.image = pg.image.load(file).convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.x = pos_x
         self.rect.y = pos_y
         self.btn_clicked = 0
-
-    def update(self, pos_xy):
-        if self.rect.collidepoint(pos_xy):
-            self.btn_clicked = 1
+        self.name = name
 
 
-class DrawText:
-    def __init__(self, screen, size, color, x, y):
+class DrawText(pg.sprite.Sprite):
+    def __init__(self, screen, size, color, x, y, name, click, text, max, valid_letters=None):
+        pg.sprite.Sprite.__init__(self)
         self.screen = screen
         self.size = size
         self.color = color
         self.x = x
         self.y = y
+        self.description = text
+        self.input_text = ""
+        self.text = self.description
         self.font = pg.font.Font("resources/You Blockhead.ttf", self.size)
+        self.image = self.font.render(text, True, color)
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = (self.x, self.y)
         # self.font = pg.font.SysFont(None, self.size)
+        self.click = click
+        self.cursor = 0
+        self.cursor_flag = 0
+        self.name = name
+        self.max = max
+        self.valid_letters = valid_letters
 
-    def draw(self, text):
-        text_surface = self.font.render(text, True, self.color)
-        text_rect = text_surface.get_rect()
-        text_rect.x, text_rect.y = (self.x, self.y)
-        self.screen.blit(text_surface, text_rect)
+    def update(self):
+        if self.click == 1:
+            if self.cursor == 1:
+                if self.cursor_flag == 0:
+                    self.cursor_flag = 1
+                    self.input_text += "_"
+                    self.text = self.description + self.input_text
+            elif self.cursor == 0:
+                if self.cursor_flag == 1:
+                    self.cursor_flag = 0
+                    self.input_text = self.input_text[:-1]
+                    self.text = self.description + self.input_text
+        self.image = self.font.render(self.text, True, self.color)
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = (self.x, self.y)
+
+    def add_letter(self, letter):
+        if self.cursor == 1 and len(self.text) <= self.max:
+            if self.valid_letters is not None:
+                if str(letter) in self.valid_letters:
+                    self.input_text = self.input_text[:-1] + letter + "_"
+                    self.text = self.description + self.input_text
+            else:
+                self.input_text += self.input_text[:-1] + letter + "_"
+                self.text = self.description + self.input_text
+
+    def back_space(self):
+        if self.cursor == 1:
+            if len(self.input_text) > 1:
+                self.input_text = self.input_text[:-1]
+                self.text = self.description + self.input_text
+
+    def finish(self):
+        if self.cursor == 1:
+            self.text = self.text[:-1]
 
 
 class Bullet(pg.sprite.Sprite):

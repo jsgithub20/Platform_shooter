@@ -177,14 +177,19 @@ class Game:
 
     def show_start_screen(self):
         # game splash/start screen
+        ip_valid_ltr = "0123456789."
+        port_valid_ltr = "0123456789"
         background = pg.image.load("resources/gui/Window_06.png").convert_alpha()
-        title = DrawText(self.screen, 50, GREEN, 350, 25)
-        name = DrawText(self.screen, 40, WHITE, 200, 300)
-        server_IP = DrawText(self.screen, 40, WHITE, 200, 350)
-        server_Port = DrawText(self.screen, 40, WHITE, 200, 400)
-        settings_btn = Buttons("resources/gui/settings.png", 100, 500)
-        start_btn = Buttons("resources/gui/right.png", 400, 500)
-        credit_btn = Buttons("resources/gui/credit.png", 700, 500)
+        title = DrawText(self.screen, 50, GREEN, 350, 25, "title", 0, "My Game", 10)
+        name = DrawText(self.screen, 35, WHITE, 150, 230, "name", 1, "Your Name: ", 27)
+        server_IP = DrawText(self.screen, 35, WHITE, 150, 300, "server_ip", 1, "Server IP: ", 26, ip_valid_ltr)
+        server_Port = DrawText(self.screen, 35, WHITE, 150, 370, "server_port", 1, "Server Port#: ", 19, port_valid_ltr)
+        text_sprites = pg.sprite.Group()
+        text_sprites.add(title, name, server_IP, server_Port)
+
+        settings_btn = Buttons("resources/gui/settings.png", 100, 500, "setting")
+        start_btn = Buttons("resources/gui/right.png", 400, 500, "start")
+        credit_btn = Buttons("resources/gui/credit.png", 700, 500, "credit")
         btn_sprites = pg.sprite.Group()
         btn_sprites.add(settings_btn, start_btn, credit_btn)
         waiting = True
@@ -195,16 +200,31 @@ class Game:
                     waiting = False
                     self.running = False
                 if event.type == pg.MOUSEBUTTONDOWN:
-                    btn_sprites.update(pg.mouse.get_pos())
-                    for button in btn_sprites:
-                        pass
+                    for txt in iter(text_sprites):
+                        if txt.rect.collidepoint(pg.mouse.get_pos()):
+                            txt.cursor = 1
+                        else:
+                            txt.cursor = 0
+                    for btn in iter(btn_sprites):
+                        if btn.rect.collidepoint(pg.mouse.get_pos()):
+                            btn.btn_clicked = 1
+                if event.type == pg.KEYDOWN:
+                    if 32 <= event.key <= 126:
+                        for txt in iter(text_sprites):
+                            txt.add_letter(event.unicode)
+                    elif event.key == pg.K_RETURN:
+                        for txt in iter(text_sprites):
+                            txt.finish()
+                    elif event.key == pg.K_BACKSPACE:
+                        for txt in iter(text_sprites):
+                            txt.back_space()
 
             self.screen.blit(background, (0, 0))
+
+            text_sprites.update()
+            text_sprites.draw(self.screen)
             btn_sprites.draw(self.screen)
-            title.draw("My Game")
-            name.draw("Name: ")
-            server_IP.draw("Server IP: ")
-            server_Port.draw("Server Port: ")
+
             pg.display.flip()
 
     def show_go_screen(self):
