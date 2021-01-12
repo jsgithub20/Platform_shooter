@@ -1,4 +1,5 @@
 import pygame as pg
+from ipaddress import ip_address
 from platform_shooter_settings import *
 
 # images for player_shooter
@@ -31,6 +32,11 @@ long_block = pg.Surface([210, 40], pg.SRCALPHA)
 long_block.blit(blocks[0], (0, 0))
 long_block.blit(blocks[1], (70, 0))
 long_block.blit(blocks[2], (140, 0))
+
+
+def warning_msg(screen, font, msg):
+    warning = font.render(msg, True, RED)
+    screen.blit(warning, (300, 300))
 
 
 class Buttons(pg.sprite.Sprite):
@@ -79,6 +85,7 @@ class DrawText(pg.sprite.Sprite):
                     self.cursor_flag = 0
                     self.input_text = self.input_text[:-1]
                     self.text = self.description + self.input_text
+
         self.image = self.font.render(self.text, True, self.color)
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = (self.x, self.y)
@@ -86,22 +93,34 @@ class DrawText(pg.sprite.Sprite):
     def add_letter(self, letter):
         if self.cursor == 1 and len(self.text) <= self.max:
             if self.valid_letters is not None:
-                if str(letter) in self.valid_letters:
+                # key.unicode recieved from keybaord is "str" already
+                if letter in self.valid_letters:
                     self.input_text = self.input_text[:-1] + letter + "_"
                     self.text = self.description + self.input_text
             else:
-                self.input_text += self.input_text[:-1] + letter + "_"
+                self.input_text = self.input_text[:-1] + letter + "_"
                 self.text = self.description + self.input_text
 
     def back_space(self):
         if self.cursor == 1:
             if len(self.input_text) > 1:
-                self.input_text = self.input_text[:-1]
+                self.input_text = self.input_text[:-2] + "_"
+                self.text = self.description + self.input_text
+            else:
+                self.input_text = "_"
                 self.text = self.description + self.input_text
 
     def finish(self):
         if self.cursor == 1:
             self.text = self.text[:-1]
+
+    def check_ip(self):
+        try:
+            ip_address(self.input_text)
+        except ValueError:
+            warning_msg(self.screen, self.font, "Wrong IP!")
+            warning_msg(self.screen, self.font, "Press a key to continue")
+            return "stop"
 
 
 class Bullet(pg.sprite.Sprite):

@@ -207,7 +207,11 @@ class Game:
                             txt.cursor = 0
                     for btn in iter(btn_sprites):
                         if btn.rect.collidepoint(pg.mouse.get_pos()):
-                            btn.btn_clicked = 1
+                            if btn.name == "start":
+                                # update text to reflect changes before checking ip validity
+                                text_sprites.update()
+                                if server_IP.check_ip() == "stop":
+                                    self.wait_for_key()
                 if event.type == pg.KEYDOWN:
                     if 32 <= event.key <= 126:
                         for txt in iter(text_sprites):
