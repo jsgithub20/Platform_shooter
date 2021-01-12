@@ -34,9 +34,7 @@ long_block.blit(blocks[1], (70, 0))
 long_block.blit(blocks[2], (140, 0))
 
 
-def warning_msg(screen, font, msg):
-    warning = font.render(msg, True, RED)
-    screen.blit(warning, (300, 300))
+
 
 
 class Buttons(pg.sprite.Sprite):
@@ -118,9 +116,25 @@ class DrawText(pg.sprite.Sprite):
         try:
             ip_address(self.input_text)
         except ValueError:
-            warning_msg(self.screen, self.font, "Wrong IP!")
-            warning_msg(self.screen, self.font, "Press a key to continue")
+            self.draw_box((700, 170), WHITE, (180, 280))
+            self.warning_msg("Invalid IP!", (400, 300))
+            self.warning_msg("Press any key to continue", (200, 370))
             return "stop"
+
+    def draw_box(self, size_xy, color, pos_xy):
+        box = pg.Surface(size_xy)
+        box.fill(color)
+        shadow = pg.Surface(size_xy)
+        shadow.fill((128, 128, 128))
+        self.screen.blit(shadow, (pos_xy[0]+5, pos_xy[1]+5))
+        self.screen.blit(box, pos_xy)
+        pg.display.flip()
+
+    def warning_msg(self, msg, pos_xy):
+        # pos_xy format should be (pos_x, pos_y)
+        warning = self.font.render(msg, True, RED)
+        self.screen.blit(warning, pos_xy)
+        pg.display.flip()
 
 
 class Bullet(pg.sprite.Sprite):

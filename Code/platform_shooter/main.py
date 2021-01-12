@@ -241,7 +241,7 @@ class Game:
         game_over_text = DrawText(self.screen, 60, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
         game_over_text.draw("GAME OVER")
         winner_text = DrawText(self.screen, 50, WHITE, SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
-        winner_text.draw("{} WINS!".format(self.winner))
+        winner_text.draw(f"{self.winner} WINS!")
         # self.draw_text("Score: " + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT / 2)
         press_key_text = DrawText(self.screen, 40, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
         press_key_text.draw("Press a key to play again")
