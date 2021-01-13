@@ -1,4 +1,5 @@
 import pygame as pg
+from sys import exit
 from platform_shooter_settings import *
 from platform_shooter_sprites import *
 import sprite_player_correction
@@ -197,8 +198,10 @@ class Game:
             self.clock.tick(FPS)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
-                    waiting = False
-                    self.running = False
+                    # waiting = False
+                    # self.running = False
+                    pg.quit()
+                    exit()
                 if event.type == pg.MOUSEBUTTONDOWN:
                     for txt in iter(text_sprites):
                         if txt.rect.collidepoint(pg.mouse.get_pos()):
@@ -212,8 +215,16 @@ class Game:
                                 text_sprites.update()
                                 if server_IP.check_ip() == "stop":
                                     self.wait_for_key()
+                                    break
+                                elif server_Port.check_port() == "stop":
+                                    self.wait_for_key()
+                                    break
+                                elif name.check_name() == "stop":
+                                    self.wait_for_key()
+                                    break
                                 else:
                                     waiting = False
+
                 if event.type == pg.KEYDOWN:
                     if 32 <= event.key <= 126:
                         for txt in iter(text_sprites):
@@ -236,17 +247,24 @@ class Game:
     def show_select_screen(self):
         background = pg.image.load("resources/gui/Window_06.png").convert_alpha()
         title = DrawText(self.screen, 35, GREEN, 290, 35, "title", 0, "Choose Your Role", 10)
+        txt_l1 = DrawText(self.screen, 25, LIGHT_BLUE, 100, 450, "strength1", 0, "Strength:", 10)
+        txt_l2 = DrawText(self.screen, 20, LIGHT_BLUE, 100, 500, "strength2", 0, "Chopper", 10)
+        txt_l3 = DrawText(self.screen, 20, LIGHT_BLUE, 100, 550, "strength3", 0, "Runner", 10)
+        txt_r1 = DrawText(self.screen, 25, RED, 670, 450, "weakness1", 0, "Weakness:", 10)
+        txt_r2 = DrawText(self.screen, 20, RED, 670, 500, "weakness2", 0, "Shot dead by", 10)
+        txt_r3 = DrawText(self.screen, 20, RED, 670, 550, "weakness3", 0, "10 bullets", 10)
         text_sprites = pg.sprite.Group()
-        text_sprites.add(title)
+        text_sprites.add(title, txt_l1, txt_l2, txt_l3, txt_r1, txt_r2, txt_r3)
 
         role_girl = PlayerIdle()
         role_sprites = pg.sprite.Group()
         role_sprites.add(role_girl)
 
-        left_btn = Buttons("resources/gui/left.png", 100, 250, "left")
-        right_btn = Buttons("resources/gui/right.png", 700, 250, "left")
+        left_btn = Buttons("resources/gui/left.png", 100, 200, "left")
+        right_btn = Buttons("resources/gui/right.png", 700, 200, "right")
+        go_btn = Buttons("resources/gui/Button_18_small.png", 870, 600, "go")
         btn_sprites = pg.sprite.Group()
-        btn_sprites.add(left_btn, right_btn)
+        btn_sprites.add(left_btn, right_btn, go_btn)
         waiting = True
         while waiting:
             self.clock.tick(FPS)
@@ -267,16 +285,6 @@ class Game:
                     #             text_sprites.update()
                     #             if server_IP.check_ip() == "stop":
                     #                 self.wait_for_key()
-                # if event.type == pg.KEYDOWN:
-                #     if 32 <= event.key <= 126:
-                #         for txt in iter(text_sprites):
-                #             txt.add_letter(event.unicode)
-                #     elif event.key == pg.K_RETURN:
-                #         for txt in iter(text_sprites):
-                #             txt.finish()
-                #     elif event.key == pg.K_BACKSPACE:
-                #         for txt in iter(text_sprites):
-                #             txt.back_space()
 
             self.screen.blit(background, (0, 0))
 
@@ -321,14 +329,14 @@ class Game:
             self.clock.tick(FPS)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
-                    waiting = False
-                    self.running = False
+                    pg.quit()
+                    exit()
                 if event.type == pg.KEYUP:
                     waiting = False
 
 
 g = Game()
-# g.show_start_screen()
+g.show_start_screen()
 g.show_select_screen()
 while g.running:
     g.new()

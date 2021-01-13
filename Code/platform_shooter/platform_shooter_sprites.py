@@ -124,6 +124,20 @@ class DrawText(pg.sprite.Sprite):
             self.warning_msg("Press any key to continue", (200, 370))
             return "stop"
 
+    def check_port(self):
+        if len(self.input_text) < 2:
+            self.draw_box((700, 170), WHITE, (180, 280))
+            self.warning_msg("Invalid port#, stupid!", (250, 300))
+            self.warning_msg("Press any key to continue", (200, 370))
+            return "stop"
+
+    def check_name(self):
+        if len(self.input_text) < 2:
+            self.draw_box((700, 170), WHITE, (180, 280))
+            self.warning_msg("Name yourself, stupid!", (250, 300))
+            self.warning_msg("Press any key to continue", (200, 370))
+            return "stop"
+
     def draw_box(self, size_xy, color, pos_xy):
         box = pg.Surface(size_xy)
         box.fill(color)
@@ -187,11 +201,12 @@ class PlayerIdle(pg.sprite.Sprite):
         self.rect.y = 200
 
     def chg_frame(self, img_list):
-        if self.image_idx + 0.5 == len(img_list):
+        # reduce frame change rate by changing frame when image_idx is increase by n (>1)
+        if self.image_idx + 1 == len(img_list)*3:
             self.image_idx = 0
         else:
-            self.image_idx += 0.5
-        self.image = img_list[int(self.image_idx)]
+            self.image_idx += 1
+        self.image = img_list[self.image_idx//3]
 
     def update(self):
         self.chg_frame(idle_girl)
