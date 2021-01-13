@@ -33,8 +33,11 @@ long_block.blit(blocks[0], (0, 0))
 long_block.blit(blocks[1], (70, 0))
 long_block.blit(blocks[2], (140, 0))
 
-
-
+idle_girl = [pg.image.load("resources/gui/Idle__000.png"), pg.image.load("resources/gui/Idle__001.png"),
+             pg.image.load("resources/gui/Idle__002.png"), pg.image.load("resources/gui/Idle__003.png"),
+             pg.image.load("resources/gui/Idle__004.png"), pg.image.load("resources/gui/Idle__005.png"),
+             pg.image.load("resources/gui/Idle__006.png"), pg.image.load("resources/gui/Idle__007.png"),
+             pg.image.load("resources/gui/Idle__008.png"), pg.image.load("resources/gui/Idle__009.png")]
 
 
 class Buttons(pg.sprite.Sprite):
@@ -117,7 +120,7 @@ class DrawText(pg.sprite.Sprite):
             ip_address(self.input_text)
         except ValueError:
             self.draw_box((700, 170), WHITE, (180, 280))
-            self.warning_msg("Invalid IP!", (400, 300))
+            self.warning_msg("Invalid IP, stupid!", (250, 300))
             self.warning_msg("Press any key to continue", (200, 370))
             return "stop"
 
@@ -165,6 +168,33 @@ class Bullet(pg.sprite.Sprite):
             self.live_flag = 0
         if pg.sprite.spritecollide(self, self.level.platform_list, False):
             self.live_flag = 0
+
+
+class PlayerIdle(pg.sprite.Sprite):
+    def __init__(self):
+        # Call the parent's constructor
+        super().__init__()
+
+        # Create an image of the block, and fill it with a color.
+        # This could also be an image loaded from the disk.
+        self.image_idx = 0
+        self.image = idle_girl[0]
+
+        # Set a referance to the image rect.
+        self.rect = self.image.get_rect()
+
+        self.rect.x = 320
+        self.rect.y = 200
+
+    def chg_frame(self, img_list):
+        if self.image_idx + 0.5 == len(img_list):
+            self.image_idx = 0
+        else:
+            self.image_idx += 0.5
+        self.image = img_list[int(self.image_idx)]
+
+    def update(self):
+        self.chg_frame(idle_girl)
 
 
 class Player(pg.sprite.Sprite):

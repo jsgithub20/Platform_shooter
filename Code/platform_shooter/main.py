@@ -212,6 +212,8 @@ class Game:
                                 text_sprites.update()
                                 if server_IP.check_ip() == "stop":
                                     self.wait_for_key()
+                                else:
+                                    waiting = False
                 if event.type == pg.KEYDOWN:
                     if 32 <= event.key <= 126:
                         for txt in iter(text_sprites):
@@ -227,6 +229,62 @@ class Game:
 
             text_sprites.update()
             text_sprites.draw(self.screen)
+            btn_sprites.draw(self.screen)
+
+            pg.display.flip()
+
+    def show_select_screen(self):
+        background = pg.image.load("resources/gui/Window_06.png").convert_alpha()
+        title = DrawText(self.screen, 35, GREEN, 290, 35, "title", 0, "Choose Your Role", 10)
+        text_sprites = pg.sprite.Group()
+        text_sprites.add(title)
+
+        role_girl = PlayerIdle()
+        role_sprites = pg.sprite.Group()
+        role_sprites.add(role_girl)
+
+        left_btn = Buttons("resources/gui/left.png", 100, 250, "left")
+        right_btn = Buttons("resources/gui/right.png", 700, 250, "left")
+        btn_sprites = pg.sprite.Group()
+        btn_sprites.add(left_btn, right_btn)
+        waiting = True
+        while waiting:
+            self.clock.tick(FPS)
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    waiting = False
+                    self.running = False
+                # if event.type == pg.MOUSEBUTTONDOWN:
+                    # for txt in iter(text_sprites):
+                    #     if txt.rect.collidepoint(pg.mouse.get_pos()):
+                    #         txt.cursor = 1
+                    #     else:
+                    #         txt.cursor = 0
+                    # for btn in iter(btn_sprites):
+                    #     if btn.rect.collidepoint(pg.mouse.get_pos()):
+                    #         if btn.name == "start":
+                    #             # update text to reflect changes before checking ip validity
+                    #             text_sprites.update()
+                    #             if server_IP.check_ip() == "stop":
+                    #                 self.wait_for_key()
+                # if event.type == pg.KEYDOWN:
+                #     if 32 <= event.key <= 126:
+                #         for txt in iter(text_sprites):
+                #             txt.add_letter(event.unicode)
+                #     elif event.key == pg.K_RETURN:
+                #         for txt in iter(text_sprites):
+                #             txt.finish()
+                #     elif event.key == pg.K_BACKSPACE:
+                #         for txt in iter(text_sprites):
+                #             txt.back_space()
+
+            self.screen.blit(background, (0, 0))
+
+            # text_sprites.update()
+            role_sprites.update()
+
+            text_sprites.draw(self.screen)
+            role_sprites.draw(self.screen)
             btn_sprites.draw(self.screen)
 
             pg.display.flip()
@@ -270,7 +328,8 @@ class Game:
 
 
 g = Game()
-g.show_start_screen()
+# g.show_start_screen()
+g.show_select_screen()
 while g.running:
     g.new()
     g.show_go_screen()

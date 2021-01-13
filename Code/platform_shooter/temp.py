@@ -7,12 +7,14 @@
 # for key, value in player_opt.items():
 #     print(key+":"+str(value))
 
-import ipaddress
+# import ipaddress
+#
+# s = "1.1.1.666"
+#
+# try:
+#     ipaddress.ip_address(s)
+#     print(f"{s} is a valid IP address.")
+# except ValueError:
+#     print(f"{s} is not a valid IP address.")
 
-s = "1.1.1.666"
-
-try:
-    ipaddress.ip_address(s)
-    print(f"{s} is a valid IP address.")
-except ValueError:
-    print(f"{s} is not a valid IP address.")
+print(int(1.5))
