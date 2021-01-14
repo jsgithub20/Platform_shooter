@@ -3,6 +3,7 @@ from sys import exit
 from platform_shooter_settings import *
 from platform_shooter_sprites import *
 import sprite_player_correction
+from role_def import *
 
 
 class Game:
@@ -247,14 +248,11 @@ class Game:
     def show_select_screen(self):
         background = pg.image.load("resources/gui/Window_06.png").convert_alpha()
         title = DrawText(self.screen, 35, GREEN, 290, 35, "title", 0, "Choose Your Role", 10)
-        txt_l1 = DrawText(self.screen, 25, LIGHT_BLUE, 100, 450, "strength1", 0, "Strength:", 10)
-        txt_l2 = DrawText(self.screen, 20, LIGHT_BLUE, 100, 500, "strength2", 0, "Chopper", 10)
-        txt_l3 = DrawText(self.screen, 20, LIGHT_BLUE, 100, 550, "strength3", 0, "Runner", 10)
-        txt_r1 = DrawText(self.screen, 25, RED, 670, 450, "weakness1", 0, "Weakness:", 10)
-        txt_r2 = DrawText(self.screen, 20, RED, 670, 500, "weakness2", 0, "Shot dead by", 10)
-        txt_r3 = DrawText(self.screen, 20, RED, 670, 550, "weakness3", 0, "10 bullets", 10)
         text_sprites = pg.sprite.Group()
-        text_sprites.add(title, txt_l1, txt_l2, txt_l3, txt_r1, txt_r2, txt_r3)
+        text_sprites.add(title)
+        for item in girl_txt:
+            description = DrawText(self.screen, item[0], item[1], item[2], item[3], item[4], item[5], item[6], item[7])
+            text_sprites.add(description)
 
         role_girl = PlayerIdle()
         role_sprites = pg.sprite.Group()
@@ -336,7 +334,7 @@ class Game:
 
 
 g = Game()
-g.show_start_screen()
+# g.show_start_screen()
 g.show_select_screen()
 while g.running:
     g.new()

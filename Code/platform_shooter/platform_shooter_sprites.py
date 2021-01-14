@@ -198,7 +198,7 @@ class PlayerIdle(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
 
         self.rect.x = 320
-        self.rect.y = 200
+        self.rect.y = 150
 
     def chg_frame(self, img_list):
         # reduce frame change rate by changing frame when image_idx is increase by n (>1)
