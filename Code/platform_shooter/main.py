@@ -20,20 +20,23 @@ class Game:
 
     def new(self):
         # fps display
-        self.fps_txt = DrawText(self.screen, 10, WHITE, 25, 0)
+        # (self, screen, size, color, x, y, name, text, click=0, max_letter=0, valid_letters=None)
+        self.fps_txt = DrawText(self.screen, 10, WHITE, 25, 0, "fps", "0")
+        self.player_shooter_score = DrawText(self.screen, 20, WHITE, 100, 10, "shooter_score", "0")
+        self.player_chopper_score = DrawText(self.screen, 20, WHITE, 600, 10, "chopper_score", "0")
 
         # start a new game
         self.bullets = []
 
         # Create the self.player
         self.player_shooter = Player()
-        self.player_shooter.hit_limit = 60
-        self.player_shooter.score_text = DrawText(self.screen, 20, WHITE, 200, 10)
+        self.player_shooter.hit_limit = 3
+        # self.player_shooter.score_text = DrawText(self.screen, 20, WHITE, 200, 10)
 
         self.player_chopper = sprite_player_correction.Player()
         self.player_chopper.hit_limit = 10
         # self.player_chopper.image.fill(WHITE)
-        self.player_chopper.score_text = DrawText(self.screen, 20, WHITE, 800, 10)
+        # self.player_chopper.score_text = DrawText(self.screen, 20, WHITE, 800, 10)
 
         # Create all the levels
         self.level_list = []
@@ -55,7 +58,8 @@ class Game:
         self.player_chopper.rect.x = 600
         self.player_chopper.rect.y = 200
 
-        self.active_sprite_list.add(self.player_shooter, self.player_chopper)
+        self.active_sprite_list.add(self.player_shooter, self.player_chopper, self.fps_txt,
+                                    self.player_shooter_score, self.player_chopper_score)
 
         self.run()
 
@@ -164,16 +168,18 @@ class Game:
         # Update items in the level
         self.current_level.update()
 
+        self.fps_txt.text = f"fps: {str(int(self.clock.get_fps()))}"
+        self.player_shooter_score.text = "Shooter Hit: {}/{}".format(self.player_shooter.hit_count,
+                                                                     self.player_shooter.hit_limit)
+        self.player_chopper_score.text = "Chopper Hit: {}/{}".format(self.player_chopper.hit_count,
+                                                                     self.player_chopper.hit_limit)
+
     def draw(self):
         # Game Loop - draw
         self.current_level.draw(self.screen)
         self.active_sprite_list.draw(self.screen)
         self.bullet_sprite_grp.draw(self.screen)
-        self.player_chopper.score_text.draw("Chopper Hit: {}/{}".format(self.player_chopper.hit_count,
-                                                                         self.player_chopper.hit_limit))
-        self.player_shooter.score_text.draw("Shooter Hit: {}/{}".format(self.player_shooter.hit_count,
-                                                                         self.player_shooter.hit_limit))
-        self.fps_txt.draw("fps: {}".format(str(int(self.clock.get_fps()))))
+
         # *after* drawing everything, flip the display
         pg.display.flip()
 
@@ -182,10 +188,10 @@ class Game:
         ip_valid_ltr = "0123456789."
         port_valid_ltr = "0123456789"
         background = pg.image.load("resources/gui/Window_06.png").convert_alpha()
-        title = DrawText(self.screen, 50, GREEN, 350, 25, "title", 0, "My Game", 10)
-        name = DrawText(self.screen, 35, WHITE, 150, 230, "name", 1, "Your Name: ", 27)
-        server_IP = DrawText(self.screen, 35, WHITE, 150, 300, "server_ip", 1, "Server IP: ", 26, ip_valid_ltr)
-        server_Port = DrawText(self.screen, 35, WHITE, 150, 370, "server_port", 1, "Server Port#: ", 19, port_valid_ltr)
+        title = DrawText(self.screen, 50, GREEN, 350, 25, "title", "My Game", 0, 10)
+        name = DrawText(self.screen, 35, WHITE, 150, 230, "name", "Your Name: ", 1, 27)
+        server_IP = DrawText(self.screen, 35, WHITE, 150, 300, "server_ip", "Server IP: ", 1, 26, ip_valid_ltr)
+        server_Port = DrawText(self.screen, 35, WHITE, 150, 370, "server_port", "Server Port#: ", 1, 19, port_valid_ltr)
         text_sprites = pg.sprite.Group()
         text_sprites.add(title, name, server_IP, server_Port)
 
@@ -247,50 +253,61 @@ class Game:
 
     def show_select_screen(self):
         background = pg.image.load("resources/gui/Window_06.png").convert_alpha()
-        title = DrawText(self.screen, 35, GREEN, 290, 35, "title", 0, "Choose Your Role", 10)
-        text_sprites = pg.sprite.Group()
-        text_sprites.add(title)
+        title = DrawText(self.screen, 35, GREEN, 290, 35, "title", "Choose Your Role", 0, 10)
+        girl_page = pg.sprite.Group()
+        girl_page.add(title)
         for item in girl_txt:
             description = DrawText(self.screen, item[0], item[1], item[2], item[3], item[4], item[5], item[6], item[7])
-            text_sprites.add(description)
+            girl_page.add(description)
+        role_girl = PlayerIdle(idle_girl, (320, 150))
+        girl_page.add(role_girl)
 
-        role_girl = PlayerIdle()
-        role_sprites = pg.sprite.Group()
-        role_sprites.add(role_girl)
+        boy_page = pg.sprite.Group()
+        boy_page.add(title)
+        for item in boy_txt:
+            description = DrawText(self.screen, item[0], item[1], item[2], item[3], item[4], item[5], item[6], item[7])
+            boy_page.add(description)
+        role_boy = PlayerIdle(idle_boy, (360, 210))
+        boy_page.add(role_boy)
+
+        role_lst = [girl_page, boy_page]
 
         left_btn = Buttons("resources/gui/left.png", 100, 200, "left")
         right_btn = Buttons("resources/gui/right.png", 700, 200, "right")
         go_btn = Buttons("resources/gui/Button_18_small.png", 870, 600, "go")
         btn_sprites = pg.sprite.Group()
         btn_sprites.add(left_btn, right_btn, go_btn)
+
         waiting = True
+        page_idx = 0
         while waiting:
             self.clock.tick(FPS)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     waiting = False
                     self.running = False
-                # if event.type == pg.MOUSEBUTTONDOWN:
-                    # for txt in iter(text_sprites):
-                    #     if txt.rect.collidepoint(pg.mouse.get_pos()):
-                    #         txt.cursor = 1
-                    #     else:
-                    #         txt.cursor = 0
-                    # for btn in iter(btn_sprites):
-                    #     if btn.rect.collidepoint(pg.mouse.get_pos()):
-                    #         if btn.name == "start":
-                    #             # update text to reflect changes before checking ip validity
-                    #             text_sprites.update()
-                    #             if server_IP.check_ip() == "stop":
-                    #                 self.wait_for_key()
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    for btn in iter(btn_sprites):
+                        if btn.rect.collidepoint(pg.mouse.get_pos()):
+                            if btn.name == "go":
+                                waiting = False
+                            elif btn.name == "left":
+                                if page_idx - 1 < 0:
+                                    page_idx = len(role_lst) - 1
+                                else:
+                                    page_idx -= 1
+                            elif btn.name == "right":
+                                if page_idx + 1 == len(role_lst):
+                                    page_idx = 0
+                                else:
+                                    page_idx += 1
 
             self.screen.blit(background, (0, 0))
 
-            # text_sprites.update()
-            role_sprites.update()
+            # update role information on the page
+            role_lst[page_idx].update()
 
-            text_sprites.draw(self.screen)
-            role_sprites.draw(self.screen)
+            role_lst[page_idx].draw(self.screen)
             btn_sprites.draw(self.screen)
 
             pg.display.flip()
@@ -334,7 +351,7 @@ class Game:
 
 
 g = Game()
-# g.show_start_screen()
+g.show_start_screen()
 g.show_select_screen()
 while g.running:
     g.new()

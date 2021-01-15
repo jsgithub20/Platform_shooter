@@ -33,11 +33,17 @@ long_block.blit(blocks[0], (0, 0))
 long_block.blit(blocks[1], (70, 0))
 long_block.blit(blocks[2], (140, 0))
 
-idle_girl = [pg.image.load("resources/gui/Idle__000.png"), pg.image.load("resources/gui/Idle__001.png"),
-             pg.image.load("resources/gui/Idle__002.png"), pg.image.load("resources/gui/Idle__003.png"),
-             pg.image.load("resources/gui/Idle__004.png"), pg.image.load("resources/gui/Idle__005.png"),
-             pg.image.load("resources/gui/Idle__006.png"), pg.image.load("resources/gui/Idle__007.png"),
-             pg.image.load("resources/gui/Idle__008.png"), pg.image.load("resources/gui/Idle__009.png")]
+idle_girl = [pg.image.load("resources/gui/girl/Idle__000.png"), pg.image.load("resources/gui/girl/Idle__001.png"),
+             pg.image.load("resources/gui/girl/Idle__002.png"), pg.image.load("resources/gui/girl/Idle__003.png"),
+             pg.image.load("resources/gui/girl/Idle__004.png"), pg.image.load("resources/gui/girl/Idle__005.png"),
+             pg.image.load("resources/gui/girl/Idle__006.png"), pg.image.load("resources/gui/girl/Idle__007.png"),
+             pg.image.load("resources/gui/girl/Idle__008.png"), pg.image.load("resources/gui/girl/Idle__009.png")]
+
+idle_boy = [pg.image.load("resources/gui/boy/Idle__000.png"), pg.image.load("resources/gui/boy/Idle__001.png"),
+             pg.image.load("resources/gui/boy/Idle__002.png"), pg.image.load("resources/gui/boy/Idle__003.png"),
+             pg.image.load("resources/gui/boy/Idle__004.png"), pg.image.load("resources/gui/boy/Idle__005.png"),
+             pg.image.load("resources/gui/boy/Idle__006.png"), pg.image.load("resources/gui/boy/Idle__007.png"),
+             pg.image.load("resources/gui/boy/Idle__008.png"), pg.image.load("resources/gui/boy/Idle__009.png")]
 
 
 class Buttons(pg.sprite.Sprite):
@@ -52,7 +58,7 @@ class Buttons(pg.sprite.Sprite):
 
 
 class DrawText(pg.sprite.Sprite):
-    def __init__(self, screen, size, color, x, y, name, click, text, max, valid_letters=None):
+    def __init__(self, screen, size, color, x, y, name, text, click=0, max_letter=0, valid_letters=None):
         pg.sprite.Sprite.__init__(self)
         self.screen = screen
         self.size = size
@@ -66,12 +72,15 @@ class DrawText(pg.sprite.Sprite):
         self.image = self.font.render(text, True, color)
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = (self.x, self.y)
-        # self.font = pg.font.SysFont(None, self.size)
+
+        # if click = 1, mouse-clicking this text item leads to an action, otherwise it doesn't
         self.click = click
         self.cursor = 0
         self.cursor_flag = 0
         self.name = name
-        self.max = max
+
+        # max = max number of letters that can be accepted by self.input_text, used to avoid long text out of screen
+        self.max = max_letter
         self.valid_letters = valid_letters
 
     def update(self):
@@ -185,31 +194,33 @@ class Bullet(pg.sprite.Sprite):
 
 
 class PlayerIdle(pg.sprite.Sprite):
-    def __init__(self):
+    # parameter of pos_xy should be given in the form of (x, y), including the parenthesis
+    def __init__(self, img_list, pos_xy):
         # Call the parent's constructor
         super().__init__()
 
         # Create an image of the block, and fill it with a color.
         # This could also be an image loaded from the disk.
+        self.img_lst = img_list
         self.image_idx = 0
-        self.image = idle_girl[0]
+        self.image = self.img_lst[0]
 
         # Set a referance to the image rect.
         self.rect = self.image.get_rect()
 
-        self.rect.x = 320
-        self.rect.y = 150
+        self.rect.x = pos_xy[0]
+        self.rect.y = pos_xy[1]
 
-    def chg_frame(self, img_list):
+    def chg_frame(self):
         # reduce frame change rate by changing frame when image_idx is increase by n (>1)
-        if self.image_idx + 1 == len(img_list)*3:
+        if self.image_idx + 1 == len(self.img_lst)*3:
             self.image_idx = 0
         else:
             self.image_idx += 1
-        self.image = img_list[self.image_idx//3]
+        self.image = self.img_lst[self.image_idx//3]
 
     def update(self):
-        self.chg_frame(idle_girl)
+        self.chg_frame()
 
 
 class Player(pg.sprite.Sprite):
