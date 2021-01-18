@@ -75,7 +75,11 @@ class DrawText(pg.sprite.Sprite):
 
         # if click = 1, mouse-clicking this text item leads to an action, otherwise it doesn't
         self.click = click
+
+        # set to 1 if this text is clicked
         self.cursor = 0
+
+        # set the flag to 1 if the cursor is on
         self.cursor_flag = 0
         self.name = name
 
@@ -121,6 +125,7 @@ class DrawText(pg.sprite.Sprite):
                 self.text = self.description + self.input_text
 
     def finish(self):
+        # remove the cursor "_" at the end of the text
         if self.cursor == 1:
             self.text = self.text[:-1]
 
@@ -134,6 +139,7 @@ class DrawText(pg.sprite.Sprite):
             return "stop"
 
     def check_port(self):
+        # port# should be > 2 digits
         if len(self.input_text) < 2:
             self.draw_box((700, 170), WHITE, (180, 280))
             self.warning_msg("Invalid port#, stupid!", (250, 300))
@@ -177,6 +183,7 @@ class Bullet(pg.sprite.Sprite):
         self.loop_count = 0
         self.level = None
         if self.direction == 'l':
+            self.imag = pg.transform.flip(self.image, True, False)
             self.speed = -self.speed
 
     def update(self):
@@ -252,13 +259,24 @@ class Player(pg.sprite.Sprite):
 
         self.direction = 'r'
 
+        # counts of the player being hit
         self.hit_count = 0
+
+        # set to 1 if the player is being hit, e.g. being chopped - which needs multiple sprite image flow
         self.hit_flag = 0
         self.jump_count = 0
+
+        # number of hit for the player to be killed
         self.hit_limit = 0
         self.score_text = None
+
+        # number of bullets that can be shot before reload
         self.loaded = 5
+
+        # number of seconds before the player can shoot more bullets
         self.reload_timer = 0
+
+        # set to 1 if the player is attacking, so the image set is changed to attacking sets
         self.attack_flg = 0
 
     def update(self):

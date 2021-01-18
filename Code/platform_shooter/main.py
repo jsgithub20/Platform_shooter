@@ -359,12 +359,15 @@ class Game:
         txt_sprites.draw(self.screen)
 
         pg.display.flip()
-        pg.time.wait(2000)
+
+        pg.time.wait(1000)
         self.wait_for_key()
 
         # pg.mixer.music.fadeout(500)
 
     def wait_for_key(self):
+        # clear the event queue in case there are anything buffered there
+        pg.event.clear()
         waiting = True
         while waiting:
             self.clock.tick(FPS)
@@ -377,8 +380,8 @@ class Game:
 
 
 g = Game()
-# g.show_start_screen()
-# g.show_select_screen()
+g.show_start_screen()
+g.show_select_screen()
 while g.running:
     g.new()
     g.show_go_screen()
