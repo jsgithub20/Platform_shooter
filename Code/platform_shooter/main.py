@@ -17,6 +17,7 @@ class Game:
         self.clock = pg.time.Clock()
         self.winner = None
         self.running = True
+        self.playing = True
 
     def new(self):
         # fps display
@@ -340,6 +341,7 @@ class Game:
         # pg.mixer.music.load(path.join(self.snd_dir, 'Yippee.ogg'))
         # pg.mixer.music.play(loops=-1)
         self.screen.fill(BLACK)
+
         game_over_text = DrawText(self.screen, 60, WHITE, 200, SCREEN_HEIGHT / 4, "game_over", "GAME OVER")
         winner_text = DrawText(self.screen, 50, WHITE, 250, SCREEN_HEIGHT/2, "winner", f"{self.winner} WINS!")
         # self.draw_text("Score: " + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT / 2)
@@ -351,6 +353,7 @@ class Game:
         #         f.write(str(self.score))
         # else:
         #     self.draw_text("High Score: " + str(self.highscore), 22, WHITE, WIDTH / 2, HEIGHT / 2 + 40)
+
         txt_sprites = pg.sprite.Group()
         txt_sprites.add(game_over_text, winner_text, press_key_text)
         txt_sprites.draw(self.screen)
