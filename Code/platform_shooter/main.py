@@ -22,8 +22,14 @@ class Game:
         # fps display
         # (self, screen, size, color, x, y, name, text, click=0, max_letter=0, valid_letters=None)
         self.fps_txt = DrawText(self.screen, 10, WHITE, 25, 0, "fps", "0")
+
+        # player score text display
         self.player_shooter_score = DrawText(self.screen, 20, WHITE, 100, 10, "shooter_score", "0")
         self.player_chopper_score = DrawText(self.screen, 20, WHITE, 600, 10, "chopper_score", "0")
+
+        # Music and sound effect
+        self.snd_yeet = pg.mixer.Sound("resources/sound/yeet.ogg")
+        self.snd_yeet.set_volume(0.2)
 
         # start a new game
         self.bullets = []
@@ -97,10 +103,12 @@ class Game:
                             bullet = Bullet(self.player_shooter.rect.x, self.player_shooter.rect.y, 'l', SCREEN_WIDTH)
                             bullet.level = self.current_level
                             self.player_shooter.attack_flg = 1
+                            self.snd_yeet.play()
                         else:
                             bullet = Bullet(self.player_shooter.rect.x, self.player_shooter.rect.y, 'r', SCREEN_WIDTH)
                             bullet.level = self.current_level
                             self.player_shooter.attack_flg = 1
+                            self.snd_yeet.play()
                         self.bullets.append(bullet)
                         self.bullet_sprite_grp.add(bullet)
                     else:
@@ -152,7 +160,7 @@ class Game:
                 if self.player_shooter.hit_flag == 0 and self.player_chopper.chop_flag == 1:
                     self.player_shooter.hit_flag = 1
                     self.player_shooter.hit_count += 1
-                    if self.player_shooter.hit_count > self.player_shooter.hit_limit:
+                    if self.player_shooter.hit_count >= self.player_shooter.hit_limit:
                         self.active_sprite_list.remove(self.player_shooter)
                         self.playing = False
                         self.winner = "Chopper"
@@ -200,6 +208,11 @@ class Game:
         credit_btn = Buttons("resources/gui/credit.png", 700, 500, "credit")
         btn_sprites = pg.sprite.Group()
         btn_sprites.add(settings_btn, start_btn, credit_btn)
+
+        pg.mixer.music.load("resources/sound/Designer_Stubble.ogg")
+        pg.mixer.music.set_volume(0.2)
+        pg.mixer.music.play(loops=-1)
+
         waiting = True
         while waiting:
             self.clock.tick(FPS)
@@ -217,7 +230,7 @@ class Game:
                             txt.cursor = 0
                     for btn in iter(btn_sprites):
                         if btn.rect.collidepoint(pg.mouse.get_pos()):
-                            if btn.name == "start":
+                            if btn.name  == "start":
                                 # update text to reflect changes before checking ip validity
                                 text_sprites.update()
                                 if server_IP.check_ip() == "stop":
@@ -230,6 +243,8 @@ class Game:
                                     self.wait_for_key()
                                     break
                                 else:
+                                    pg.mixer.music.fadeout(500)
+                                    pg.mixer.music.unload()
                                     waiting = False
 
                 if event.type == pg.KEYDOWN:
@@ -278,6 +293,10 @@ class Game:
         btn_sprites = pg.sprite.Group()
         btn_sprites.add(left_btn, right_btn, go_btn)
 
+        pg.mixer.music.load("resources/sound/Amazon.ogg")
+        pg.mixer.music.set_volume(0.2)
+        pg.mixer.music.play(loops=-1)
+
         waiting = True
         page_idx = 0
         while waiting:
@@ -290,6 +309,8 @@ class Game:
                     for btn in iter(btn_sprites):
                         if btn.rect.collidepoint(pg.mouse.get_pos()):
                             if btn.name == "go":
+                                pg.mixer.music.fadeout(500)
+                                pg.mixer.music.unload()
                                 waiting = False
                             elif btn.name == "left":
                                 if page_idx - 1 < 0:
@@ -319,13 +340,10 @@ class Game:
         # pg.mixer.music.load(path.join(self.snd_dir, 'Yippee.ogg'))
         # pg.mixer.music.play(loops=-1)
         self.screen.fill(BLACK)
-        game_over_text = DrawText(self.screen, 60, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
-        game_over_text.draw("GAME OVER")
-        winner_text = DrawText(self.screen, 50, WHITE, SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
-        winner_text.draw(f"{self.winner} WINS!")
+        game_over_text = DrawText(self.screen, 60, WHITE, 200, SCREEN_HEIGHT / 4, "game_over", "GAME OVER")
+        winner_text = DrawText(self.screen, 50, WHITE, 250, SCREEN_HEIGHT/2, "winner", f"{self.winner} WINS!")
         # self.draw_text("Score: " + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT / 2)
-        press_key_text = DrawText(self.screen, 40, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
-        press_key_text.draw("Press a key to play again")
+        press_key_text = DrawText(self.screen, 40, WHITE, 100, SCREEN_HEIGHT * 3 / 4, "press_key", "Press a key to play again")
         # if self.score > self.highscore:
         #     self.highscore = self.score
         #     self.draw_text("NEW HIGH SCORE!", 22, WHITE, WIDTH / 2, HEIGHT / 2 + 40)
@@ -333,9 +351,14 @@ class Game:
         #         f.write(str(self.score))
         # else:
         #     self.draw_text("High Score: " + str(self.highscore), 22, WHITE, WIDTH / 2, HEIGHT / 2 + 40)
+        txt_sprites = pg.sprite.Group()
+        txt_sprites.add(game_over_text, winner_text, press_key_text)
+        txt_sprites.draw(self.screen)
+
         pg.display.flip()
         pg.time.wait(2000)
         self.wait_for_key()
+
         # pg.mixer.music.fadeout(500)
 
     def wait_for_key(self):
@@ -351,8 +374,8 @@ class Game:
 
 
 g = Game()
-g.show_start_screen()
-g.show_select_screen()
+# g.show_start_screen()
+# g.show_select_screen()
 while g.running:
     g.new()
     g.show_go_screen()
