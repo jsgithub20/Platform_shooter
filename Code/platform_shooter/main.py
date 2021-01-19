@@ -269,9 +269,13 @@ class Game:
 
     def show_select_screen(self):
         background = pg.image.load("resources/gui/Window_06.png").convert_alpha()
-        title = DrawText(self.screen, 35, GREEN, 290, 35, "title", "Choose Your Role", 0, 10)
+        match_deathmatch = DrawText(self.screen, 35, GREEN, 350, 35, "deathmatch", "Deathmatch", 0, 10)
+        match_1st23 = DrawText(self.screen, 35, GREEN, 450, 35, "1st23", "1st23", 0, 10)
+        match_bestof3 = DrawText(self.screen, 35, GREEN, 350, 35, "bestof3", "Best of 3", 0, 10)
+        match_types = [match_deathmatch, match_1st23, match_bestof3]
+        match_select = pg.sprite.GroupSingle(match_types[0])
+
         girl_page = pg.sprite.Group()
-        girl_page.add(title)
         for item in girl_txt:
             description = DrawText(self.screen, item[0], item[1], item[2], item[3], item[4], item[5], item[6], item[7])
             girl_page.add(description)
@@ -279,7 +283,6 @@ class Game:
         girl_page.add(role_girl)
 
         boy_page = pg.sprite.Group()
-        boy_page.add(title)
         for item in boy_txt:
             description = DrawText(self.screen, item[0], item[1], item[2], item[3], item[4], item[5], item[6], item[7])
             boy_page.add(description)
@@ -288,11 +291,14 @@ class Game:
 
         role_lst = [girl_page, boy_page]
 
+        right_btn_match = Buttons("resources/gui/right_small.png", 760, 60, "right_match")
+        left_btn_match = Buttons("resources/gui/left_small.png", 160, 60, "left_match")
+
         left_btn = Buttons("resources/gui/left.png", 100, 200, "left")
         right_btn = Buttons("resources/gui/right.png", 700, 200, "right")
         go_btn = Buttons("resources/gui/Button_18_small.png", 870, 600, "go")
         btn_sprites = pg.sprite.Group()
-        btn_sprites.add(left_btn, right_btn, go_btn)
+        btn_sprites.add(left_btn, right_btn, go_btn, right_btn_match, left_btn_match)
 
         pg.mixer.music.load("resources/sound/Amazon.ogg")
         pg.mixer.music.set_volume(0.2)
@@ -300,6 +306,7 @@ class Game:
 
         waiting = True
         page_idx = 0
+        match_idx = 0
         while waiting:
             self.clock.tick(FPS)
             for event in pg.event.get():
@@ -323,6 +330,20 @@ class Game:
                                     page_idx = 0
                                 else:
                                     page_idx += 1
+                            elif btn.name == "left_match":
+                                if match_idx - 1 < 0:
+                                    match_idx = len(match_types) - 1
+                                else:
+                                    match_idx -= 1
+                                match_select.empty()
+                                match_select.add(match_types[match_idx])
+                            elif btn.name == "right_match":
+                                if match_idx + 1 == len(match_types):
+                                    match_idx = 0
+                                else:
+                                    match_idx += 1
+                                match_select.empty()
+                                match_select.add(match_types[match_idx])
 
             self.screen.blit(background, (0, 0))
 
@@ -331,6 +352,7 @@ class Game:
 
             role_lst[page_idx].draw(self.screen)
             btn_sprites.draw(self.screen)
+            match_select.draw(self.screen)
 
             pg.display.flip()
 
@@ -380,7 +402,7 @@ class Game:
 
 
 g = Game()
-g.show_start_screen()
+# g.show_start_screen()
 g.show_select_screen()
 while g.running:
     g.new()
