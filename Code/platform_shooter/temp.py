@@ -17,4 +17,6 @@
 # except ValueError:
 #     print(f"{s} is not a valid IP address.")
 
-print(int(1.5))
+import sys
+
+print(sys.platform)

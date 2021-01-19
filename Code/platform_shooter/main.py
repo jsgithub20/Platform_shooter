@@ -15,6 +15,11 @@ class Game:
         # self.bg = pg.image.load("resources/platform/Tree_1024_768.png")
         # self.screen.blit(self.bg, (0, 0))
         self.clock = pg.time.Clock()
+        self.match_type = None
+
+        # match score
+        match_score = {"round": 0, "shooter": 0, "chopper": 0}
+
         self.winner = None
         self.running = True
         self.playing = True
@@ -191,6 +196,9 @@ class Game:
 
         # *after* drawing everything, flip the display
         pg.display.flip()
+
+    def check_winner(self, match_score, match_type):
+        pass
 
     def show_start_screen(self):
         # game splash/start screen
