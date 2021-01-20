@@ -179,9 +179,9 @@ class Game:
                     if self.player_shooter.hit_count >= self.player_shooter.hit_limit:
                         # self.active_sprite_list.remove(self.player_shooter)
                         self.match_score["chopper"] += 1
-                        a = self.check_winner()
-                        print(a)
-                        self.winner, self.playing = a
+                        self.winner, self.playing = self.check_winner()
+                        if self.winner is None:
+                            self.new()
 
                 elif self.player_shooter.hit_flag == 1 and self.player_chopper.chop_flag == 0:
                     self.player_shooter.hit_flag = 0
@@ -225,7 +225,7 @@ class Game:
             elif self.match_score["chopper"] == 3:
                 return "chopper", False
             else:
-                self.new()
+                return None, True
         # elif self.match_score["match_type"] == self.match_types[2]:
         #     # best of 3
         #     pass
@@ -399,8 +399,6 @@ class Game:
 
     def show_go_screen(self):
         # game over/reset/continue
-        self.match_score = {"match_type": self.match_types[0], "round": 0, "shooter": 0, "chopper": 0, "game_finished": False}
-
         if not self.running:
             return
         # pg.mixer.music.load(path.join(self.snd_dir, 'Yippee.ogg'))
@@ -451,8 +449,8 @@ class Game:
 
 g = Game()
 # g.show_start_screen()
-g.show_select_screen()
 while g.running:
+    g.show_select_screen()
     g.new()
     g.show_go_screen()
 
