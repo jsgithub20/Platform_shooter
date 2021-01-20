@@ -15,19 +15,29 @@ class Game:
         # self.bg = pg.image.load("resources/platform/Tree_1024_768.png")
         # self.screen.blit(self.bg, (0, 0))
         self.clock = pg.time.Clock()
-        self.match_type = None
+
+        # match types
+        self.match_types = ["Deathmatch", "1st23", "Best of 3"]
 
         # match score
-        match_score = {"round": 0, "shooter": 0, "chopper": 0}
+        self.match_score = {"match_type": self.match_types[0], "round": 0, "shooter": 0, "chopper": 0, "game_finished": False}
 
         self.winner = None
         self.running = True
         self.playing = True
 
     def new(self):
+        if self.match_score["game_finished"]:
+            return
+        else:
+            self.match_score["round"] += 1
+
         # fps display
-        # (self, screen, size, color, x, y, name, text, click=0, max_letter=0, valid_letters=None)
         self.fps_txt = DrawText(self.screen, 10, WHITE, 25, 0, "fps", "0")
+
+        # match type
+        match_type = self.match_score["match_type"]
+        match_type_txt = DrawText(self.screen, 20, WHITE, 25, 0, "match_type", match_type, centered=True)
 
         # player score text display
         self.player_shooter_score = DrawText(self.screen, 20, WHITE, 100, 10, "shooter_score", "0")
@@ -70,7 +80,7 @@ class Game:
         self.player_chopper.rect.x = 600
         self.player_chopper.rect.y = 200
 
-        self.active_sprite_list.add(self.player_shooter, self.player_chopper, self.fps_txt,
+        self.active_sprite_list.add(self.player_shooter, self.player_chopper, self.fps_txt, match_type_txt,
                                     self.player_shooter_score, self.player_chopper_score)
 
         self.run()
@@ -158,18 +168,21 @@ class Game:
                 self.player_chopper.hit_count += 1
 
                 if self.player_chopper.hit_count == self.player_chopper.hit_limit:
-                    self.active_sprite_list.remove(self.player_chopper)
-                    self.playing = False
-                    self.winner = "Shooter"
+                    # self.active_sprite_list.remove(self.player_chopper)
+                    self.match_score["shooter"] += 1
+                    self.winner, self.playing = self.check_winner()
 
             if pg.sprite.collide_rect(self.player_shooter, self.player_chopper):
                 if self.player_shooter.hit_flag == 0 and self.player_chopper.chop_flag == 1:
                     self.player_shooter.hit_flag = 1
                     self.player_shooter.hit_count += 1
                     if self.player_shooter.hit_count >= self.player_shooter.hit_limit:
-                        self.active_sprite_list.remove(self.player_shooter)
-                        self.playing = False
-                        self.winner = "Chopper"
+                        # self.active_sprite_list.remove(self.player_shooter)
+                        self.match_score["chopper"] += 1
+                        a = self.check_winner()
+                        print(a)
+                        self.winner, self.playing = a
+
                 elif self.player_shooter.hit_flag == 1 and self.player_chopper.chop_flag == 0:
                     self.player_shooter.hit_flag = 0
 
@@ -195,10 +208,27 @@ class Game:
         self.bullet_sprite_grp.draw(self.screen)
 
         # *after* drawing everything, flip the display
-        pg.display.flip()
+        pg.display.update()
 
-    def check_winner(self, match_score, match_type):
-        pass
+    def check_winner(self):
+        # return the winner role (if game over) or None, and a bool value for self.playing
+        if self.match_score["match_type"] == self.match_types[0]:
+            # death match
+            if self.match_score["shooter"] == 1:
+                return "shooter", False
+            elif self.match_score["chopper"] == 1:
+                return "chopper", False
+        elif self.match_score["match_type"] == self.match_types[1]:
+            # 1st23
+            if self.match_score["shooter"] == 3:
+                return "shooter", False
+            elif self.match_score["chopper"] == 3:
+                return "chopper", False
+            else:
+                self.new()
+        # elif self.match_score["match_type"] == self.match_types[2]:
+        #     # best of 3
+        #     pass
 
     def show_start_screen(self):
         # game splash/start screen
@@ -277,11 +307,11 @@ class Game:
 
     def show_select_screen(self):
         background = pg.image.load("resources/gui/Window_06.png").convert_alpha()
-        match_deathmatch = DrawText(self.screen, 35, GREEN, 350, 35, "deathmatch", "Deathmatch", 0, 10)
-        match_1st23 = DrawText(self.screen, 35, GREEN, 450, 35, "1st23", "1st23", 0, 10)
-        match_bestof3 = DrawText(self.screen, 35, GREEN, 350, 35, "bestof3", "Best of 3", 0, 10)
-        match_types = [match_deathmatch, match_1st23, match_bestof3]
-        match_select = pg.sprite.GroupSingle(match_types[0])
+        match_type_txt_lst = []
+        for match in self.match_types:
+            txt = DrawText(self.screen, 35, GREEN, 0, 35, match, match, 0, 10, centered=True)
+            match_type_txt_lst.append(txt)
+        match_select = pg.sprite.GroupSingle(match_type_txt_lst[0])
 
         girl_page = pg.sprite.Group()
         for item in girl_txt:
@@ -340,23 +370,26 @@ class Game:
                                     page_idx += 1
                             elif btn.name == "left_match":
                                 if match_idx - 1 < 0:
-                                    match_idx = len(match_types) - 1
+                                    match_idx = len(match_type_txt_lst) - 1
                                 else:
                                     match_idx -= 1
                                 match_select.empty()
-                                match_select.add(match_types[match_idx])
+                                match_select.add(match_type_txt_lst[match_idx])
+                                self.match_score["match_type"] = self.match_types[match_idx]
                             elif btn.name == "right_match":
-                                if match_idx + 1 == len(match_types):
+                                if match_idx + 1 == len(match_type_txt_lst):
                                     match_idx = 0
                                 else:
                                     match_idx += 1
                                 match_select.empty()
-                                match_select.add(match_types[match_idx])
+                                match_select.add(match_type_txt_lst[match_idx])
+                                self.match_score["match_type"] = self.match_types[match_idx]
 
             self.screen.blit(background, (0, 0))
 
             # update role information on the page
             role_lst[page_idx].update()
+            match_select.update()
 
             role_lst[page_idx].draw(self.screen)
             btn_sprites.draw(self.screen)
@@ -365,17 +398,22 @@ class Game:
             pg.display.flip()
 
     def show_go_screen(self):
-        # game over/continue
+        # game over/reset/continue
+        self.match_score = {"match_type": self.match_types[0], "round": 0, "shooter": 0, "chopper": 0, "game_finished": False}
+
         if not self.running:
             return
         # pg.mixer.music.load(path.join(self.snd_dir, 'Yippee.ogg'))
         # pg.mixer.music.play(loops=-1)
         self.screen.fill(BLACK)
-
-        game_over_text = DrawText(self.screen, 60, WHITE, 200, SCREEN_HEIGHT / 4, "game_over", "GAME OVER")
-        winner_text = DrawText(self.screen, 50, WHITE, 250, SCREEN_HEIGHT/2, "winner", f"{self.winner} WINS!")
+        game_over_text = DrawText(self.screen, 60, WHITE, 0, SCREEN_HEIGHT / 4, "game_over", "GAME OVER",
+                                  centered=True)
+        match_type = self.match_score["match_type"]
+        winner_text = DrawText(self.screen, 50, WHITE, 0, SCREEN_HEIGHT/2, "winner",
+                               f"{match_type}: {self.winner} WINS!", centered=True)
         # self.draw_text("Score: " + str(self.score), 22, WHITE, WIDTH / 2, HEIGHT / 2)
-        press_key_text = DrawText(self.screen, 40, WHITE, 100, SCREEN_HEIGHT * 3 / 4, "press_key", "Press a key to play again")
+        press_key_text = DrawText(self.screen, 40, WHITE, 0, SCREEN_HEIGHT * 3 / 4, "press_key",
+                                  "Press a key to play again", centered=True)
         # if self.score > self.highscore:
         #     self.highscore = self.score
         #     self.draw_text("NEW HIGH SCORE!", 22, WHITE, WIDTH / 2, HEIGHT / 2 + 40)
@@ -386,6 +424,8 @@ class Game:
 
         txt_sprites = pg.sprite.Group()
         txt_sprites.add(game_over_text, winner_text, press_key_text)
+
+        txt_sprites.update()
         txt_sprites.draw(self.screen)
 
         pg.display.flip()

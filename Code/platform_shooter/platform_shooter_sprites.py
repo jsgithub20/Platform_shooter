@@ -58,7 +58,7 @@ class Buttons(pg.sprite.Sprite):
 
 
 class DrawText(pg.sprite.Sprite):
-    def __init__(self, screen, size, color, x, y, name, text, click=0, max_letter=0, valid_letters=None):
+    def __init__(self, screen, size, color, x, y, name, text, click=0, max_letter=0, valid_letters=None, centered=False):
         pg.sprite.Sprite.__init__(self)
         self.screen = screen
         self.size = size
@@ -72,6 +72,9 @@ class DrawText(pg.sprite.Sprite):
         self.image = self.font.render(text, True, color)
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = (self.x, self.y)
+
+        # if centered, the text surface will be centered horizontally on the screen
+        self.centered = centered
 
         # if click = 1, mouse-clicking this text item leads to an action, otherwise it doesn't
         self.click = click
@@ -103,6 +106,8 @@ class DrawText(pg.sprite.Sprite):
         self.image = self.font.render(self.text, True, self.color)
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = (self.x, self.y)
+        if self.centered:
+            self.rect.midtop = (pg.Surface.get_width(self.screen)/2, self.y)
 
     def add_letter(self, letter):
         if self.cursor == 1 and len(self.text) <= self.max:
