@@ -37,7 +37,8 @@ class Game:
 
         # match type
         match_type = self.match_score["match_type"]
-        match_type_txt = DrawText(self.screen, 20, WHITE, 25, 0, "match_type", match_type, centered=True)
+        match_score = str(self.match_score["shooter"]) + " - " + match_type + " - " + str(self.match_score["chopper"])
+        match_type_txt = DrawText(self.screen, 20, WHITE, 25, 720, "match_score", match_score, centered=True)
 
         # player score text display
         self.player_shooter_score = DrawText(self.screen, 20, WHITE, 100, 10, "shooter_score", "0")
@@ -56,7 +57,7 @@ class Game:
         # self.player_shooter.score_text = DrawText(self.screen, 20, WHITE, 200, 10)
 
         self.player_chopper = sprite_player_correction.Player()
-        self.player_chopper.hit_limit = 10
+        self.player_chopper.hit_limit = 3
         # self.player_chopper.image.fill(WHITE)
         # self.player_chopper.score_text = DrawText(self.screen, 20, WHITE, 800, 10)
 
@@ -171,6 +172,8 @@ class Game:
                     # self.active_sprite_list.remove(self.player_chopper)
                     self.match_score["shooter"] += 1
                     self.winner, self.playing = self.check_winner()
+                    if self.winner is None:
+                        self.new()
 
             if pg.sprite.collide_rect(self.player_shooter, self.player_chopper):
                 if self.player_shooter.hit_flag == 0 and self.player_chopper.chop_flag == 1:
@@ -226,9 +229,18 @@ class Game:
                 return "chopper", False
             else:
                 return None, True
-        # elif self.match_score["match_type"] == self.match_types[2]:
-        #     # best of 3
-        #     pass
+        elif self.match_score["match_type"] == self.match_types[2]:
+            # best of 3
+            if self.match_score["shooter"] == 2 and self.match_score["chopper"] == 0:
+                return "shooter", False
+            elif self.match_score["chopper"] == 2 and self.match_score["shooter"] == 0:
+                return "chopper", False
+            elif self.match_score["shooter"] == 3:
+                return "shooter", False
+            elif self.match_score["chopper"] == 3:
+                return "chopper", False
+            else:
+                return None, True
 
     def show_start_screen(self):
         # game splash/start screen
@@ -307,6 +319,9 @@ class Game:
 
     def show_select_screen(self):
         background = pg.image.load("resources/gui/Window_06.png").convert_alpha()
+
+        self.match_score = {"match_type": self.match_types[0], "round": 0, "shooter": 0, "chopper": 0, "game_finished": False}
+
         match_type_txt_lst = []
         for match in self.match_types:
             txt = DrawText(self.screen, 35, GREEN, 0, 35, match, match, 0, 10, centered=True)
@@ -349,8 +364,8 @@ class Game:
             self.clock.tick(FPS)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
-                    waiting = False
-                    self.running = False
+                    pg.quit()
+                    exit()
                 if event.type == pg.MOUSEBUTTONDOWN:
                     for btn in iter(btn_sprites):
                         if btn.rect.collidepoint(pg.mouse.get_pos()):
