@@ -68,7 +68,8 @@ class DrawText(pg.sprite.Sprite):
         self.description = text
         self.input_text = ""
         self.text = self.description
-        self.font = pg.font.Font("resources/You Blockhead.ttf", self.size)
+        # self.font = pg.font.Font("resources/You Blockhead.ttf", self.size)
+        self.font = pg.font.Font("resources/FontTest1_CapitalLetters.ttf", self.size)
         self.image = self.font.render(text, True, color)
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = (self.x, self.y)
