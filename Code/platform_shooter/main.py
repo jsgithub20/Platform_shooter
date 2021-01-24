@@ -88,12 +88,16 @@ class Game:
 
     def run(self):
         # Game Loop
+        pg.mixer.music.load("resources/sound/Resurrection of the Dagger.ogg")
+        pg.mixer.music.set_volume(0.3)
+        pg.mixer.music.play(loops=-1)
         self.playing = True
         while self.playing:
             self.clock.tick(FPS)
             self.events()
             self.update()
             self.draw()
+        pg.mixer.music.unload()
 
     def events(self):
         # Game Loop - events
@@ -114,6 +118,7 @@ class Game:
                     self.player_shooter.jump()
                 if event.key == pg.K_SPACE:
                     if self.player_shooter.loaded > 0:
+                        self.player_shooter.image_idx = 0
                         self.player_shooter.reload_timer = pg.time.get_ticks()
                         self.player_shooter.loaded -= 1
                         if self.player_shooter.direction == 'l':
