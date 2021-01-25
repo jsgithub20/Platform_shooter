@@ -63,11 +63,11 @@ class Game:
 
         # Create all the levels
         self.level_list = []
-        self.level_list.append(Level_01(self.player_shooter))
-        self.level_list.append(Level_01(self.player_chopper))
+        self.level_list.append(Level_01(self.player_shooter, self.player_chopper))
+        self.level_list.append(Level_02(self.player_chopper, self.player_chopper))
 
         # Set the current level
-        self.current_level_no = 0
+        self.current_level_no = 1
         self.current_level = self.level_list[self.current_level_no]
 
         self.active_sprite_list = pg.sprite.Group()
@@ -471,7 +471,7 @@ g = Game()
 # g.show_start_screen()
 while g.running:
     # g.show_select_screen()
-    # g.new()
+    g.new()
     g.show_go_screen()
 
 pg.quit()

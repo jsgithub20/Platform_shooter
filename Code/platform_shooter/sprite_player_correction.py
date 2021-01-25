@@ -111,7 +111,6 @@ class Player(pg.sprite.Sprite):
         for block in block_hit_list:
             # Reset our position based on the top/bottom of the object.
             if self.change_y > 0:
-                pass
                 self.rect.bottom = block.rect.top
                 self.jump_count = 0
             elif self.change_y < 0:

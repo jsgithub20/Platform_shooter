@@ -33,6 +33,8 @@ long_block.blit(blocks[0], (0, 0))
 long_block.blit(blocks[1], (70, 0))
 long_block.blit(blocks[2], (140, 0))
 
+crate = pg.image.load("resources/platform/Crate.png")
+
 idle_girl = [pg.image.load("resources/gui/girl/Idle__000.png"), pg.image.load("resources/gui/girl/Idle__001.png"),
              pg.image.load("resources/gui/girl/Idle__002.png"), pg.image.load("resources/gui/girl/Idle__003.png"),
              pg.image.load("resources/gui/girl/Idle__004.png"), pg.image.load("resources/gui/girl/Idle__005.png"),
@@ -317,7 +319,6 @@ class Player(pg.sprite.Sprite):
         # Check and see if we hit anything
         block_hit_list = pg.sprite.spritecollide(self, self.level.platform_list, False)
         for block in block_hit_list:
-
             # Reset our position based on the top/bottom of the object.
             if self.change_y > 0:
                 self.rect.bottom = block.rect.top
@@ -405,12 +406,12 @@ class Player(pg.sprite.Sprite):
 class Platform(pg.sprite.Sprite):
     """ Platform the user can jump on """
 
-    def __init__(self, pos_x, pos_y):
+    def __init__(self, block, pos_x, pos_y):
         """ Platform constructor. Assumes constructed with user passing in
             an array of 5 numbers like what's defined at the top of this
             code. """
         super().__init__()
-        self.image = long_block
+        self.image = block
 
         self.rect = self.image.get_rect()
         self.rect.x = pos_x
@@ -419,13 +420,13 @@ class Platform(pg.sprite.Sprite):
 
 class MovingPlatform(Platform):
     """ This is a fancier platform that can actually move. """
-    def __init__(self, player_grp):
-        super().__init__()
+    def __init__(self, block, pos_x, pos_y, player_grp):
+        super().__init__(block, pos_x, pos_y)
         self.change_x = 0
-        self.change_y = 0
+        self.change_y = 1
 
-        self.boundary_top = 0
-        self.boundary_bottom = 0
+        self.boundary_top = 100
+        self.boundary_bottom = 570
         self.boundary_left = 0
         self.boundary_right = 0
 
@@ -480,9 +481,9 @@ class MovingPlatform(Platform):
         if self.rect.bottom > self.boundary_bottom or self.rect.top < self.boundary_top:
             self.change_y *= -1
 
-        cur_pos = self.rect.x - self.level.world_shift
-        if cur_pos < self.boundary_left or cur_pos > self.boundary_right:
-            self.change_x *= -1
+        # cur_pos = self.rect.x - self.level.world_shift
+        # if cur_pos < self.boundary_left or cur_pos > self.boundary_right:
+        #     self.change_x *= -1
 
 
 class Level:
@@ -542,14 +543,13 @@ class Level_01(Level):
                  [50, 650],
                  [600, 650],
                  [0, 300],
-                 [924, 500],
                  [400, 300],
                  [440, 270]
                  ]
 
         # Go through the array above and add platforms
         for platform in level:
-            block = Platform(platform[0], platform[1])
+            block = Platform(long_block, platform[0], platform[1])
             # block.player = self.player
             self.platform_list.add(block)
 
@@ -565,7 +565,7 @@ class Level_02(Level):
         self.player_list.add(player1, player2)
 
 
-        # Array with width, height, x, and y of platform
+        # Array with x, and y of platform
         level = [[600, 500],
                  [200, 400],
                  [700, 300],
@@ -574,16 +574,20 @@ class Level_02(Level):
                  [600, 100],
                  [100, 500],
                  [50, 650],
-                 [600, 650],
+                 [750, 650],
                  [0, 300],
                  [924, 500],
                  ]
 
         # Go through the array above and add platforms
         for platform in level:
-            block = Platform(platform[0], platform[1])
+            block = Platform(long_block, platform[0], platform[1])
             # block.player = self.player
             self.platform_list.add(block)
 
-        moving_block = MovingPlatform(250, 500)
+        # .convert_alpha() can only be used in a method of a class here, otherwise
+        # the error "cannot convert without pygame.display initialized" will occur when this module is imported
+        # to "main.py". The reason being the method in a class is only executed when the instance of a class is
+        # created, but the lines out of the methods of a class will be executed when this module is imported
+        moving_block = MovingPlatform(crate.convert_alpha(), 470, 300, self.player_list)
         self.platform_list.add(moving_block)
