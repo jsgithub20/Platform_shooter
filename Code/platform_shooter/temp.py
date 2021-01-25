@@ -1,22 +1,33 @@
-# player_opt = {"shooter": (0, 0), "chopper": (250, 250)}
-# # string = str(player_opt)
-# # print(dict(string))
-# # print(key for key, value in player_opt.items())
-# # print((key, value) for key, value in player_opt.items())
-# player_opt["shooter"] = 1
-# for key, value in player_opt.items():
-#     print(key+":"+str(value))
+class Animal:
+    def __init__(self,name,age,weight):
+        self.name=name
+        self.age=age
+        self.weight=weight
 
-# import ipaddress
-#
-# s = "1.1.1.666"
-#
-# try:
-#     ipaddress.ip_address(s)
-#     print(f"{s} is a valid IP address.")
-# except ValueError:
-#     print(f"{s} is not a valid IP address.")
 
-import sys
+class Dog(Animal):
+    def __init__(self,name,age,weight,owner):
+        super().__init__(name,age,weight)
+        self.owner=owner
 
-print(sys.platform)
+
+class NewDog(Animal):
+    def __init__(self,name,age,weight,owner):
+        Animal.__init__(self, name,age,weight)
+        self.owner = owner
+
+
+class Cat(Animal):
+    def __init__(self, name,age,weight,sound):
+        super().__init__(name, age, weight)
+        self.sound = sound
+
+
+d1=Dog('小白','2','20','小黑')
+d2=Dog('小白','2','20','小黑')
+
+c1 = Cat("meow1", "2", "4", "meow")
+
+print('%s的主人是%s'%(d2.name,d2.owner))#小白的主人是小黑
+
+print(f"{c1.name} is a cat, and she makes sound of '{c1.sound}'")

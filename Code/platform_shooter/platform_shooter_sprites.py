@@ -68,8 +68,7 @@ class DrawText(pg.sprite.Sprite):
         self.description = text
         self.input_text = ""
         self.text = self.description
-        # self.font = pg.font.Font("resources/You Blockhead.ttf", self.size)
-        self.font = pg.font.Font("resources/FontTest1_CapitalLetters.ttf", self.size)
+        self.font = pg.font.Font("resources/You Blockhead.ttf", self.size)
         self.image = self.font.render(text, True, color)
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = (self.x, self.y)
@@ -418,17 +417,85 @@ class Platform(pg.sprite.Sprite):
         self.rect.y = pos_y
 
 
+class MovingPlatform(Platform):
+    """ This is a fancier platform that can actually move. """
+    def __init__(self, player_grp):
+        super().__init__()
+        self.change_x = 0
+        self.change_y = 0
+
+        self.boundary_top = 0
+        self.boundary_bottom = 0
+        self.boundary_left = 0
+        self.boundary_right = 0
+
+        self.level = None
+        self.player_grp = player_grp
+
+    def update(self):
+        """ Move the platform. This update has to be called after the player update.
+            basically, the update() for any moving parts has to be called one after the other.
+            If the player is in the way, it will shove the player
+            out of the way. This does NOT handle what happens if a
+            platform shoves a player into another object. Make sure
+            moving platforms have clearance to push the player around
+            or add code to handle what happens if they don't. """
+
+        # Move left/right
+        self.rect.x += self.change_x
+
+        # See if we hit the player
+        hit = pg.sprite.spritecollide(self, self.player_grp, False)
+        if hit:
+            # We did hit the player. Shove the player around and
+            # assume he/she won't hit anything else.
+
+            # If we are moving right, set our right side
+            # to the left side of the item we hit
+            for player in hit:
+                if self.change_x < 0:
+                    player.rect.right = self.rect.left
+                else:
+                    # Otherwise if we are moving left, do the opposite.
+                    player.rect.left = self.rect.right
+
+        # Move up/down
+        self.rect.y += self.change_y
+
+        # Check and see if we the player
+        hit = pg.sprite.spritecollide(self, self.player_grp, False)
+        if hit:
+            # We did hit the player. Shove the player around and
+            # assume he/she won't hit anything else.
+
+            # Reset our position based on the top/bottom of the object.
+            for player in hit:
+                if self.change_y < 0:
+                    player.rect.bottom = self.rect.top
+                else:
+                    player.rect.top = self.rect.bottom
+
+        # Check the boundaries and see if we need to reverse
+        # direction.
+        if self.rect.bottom > self.boundary_bottom or self.rect.top < self.boundary_top:
+            self.change_y *= -1
+
+        cur_pos = self.rect.x - self.level.world_shift
+        if cur_pos < self.boundary_left or cur_pos > self.boundary_right:
+            self.change_x *= -1
+
+
 class Level:
     """ This is a generic super-class used to define a level.
         Create a child class for each level with level-specific
         info. """
 
-    def __init__(self, player):
+    def __init__(self):
         """ Constructor. Pass in a handle to player. Needed for when moving platforms
             collide with the player. """
         self.platform_list = pg.sprite.Group()
         self.enemy_list = pg.sprite.Group()
-        self.player = player
+        self.player_list = pg.sprite.Group()
 
         # Background image
         # self.background = pg.image.load("resources/platform/Tree_1024_768.png").convert_alpha()
@@ -456,11 +523,12 @@ class Level:
 class Level_01(Level):
     """ Definition for level 1. """
 
-    def __init__(self, player):
+    def __init__(self, player1, player2):
         """ Create level 1. """
 
         # Call the parent constructor
-        Level.__init__(self, player)
+        Level.__init__(self)
+        self.player_list.add(player1, player2)
 
 
         # Array with width, height, x, and y of platform
@@ -482,5 +550,40 @@ class Level_01(Level):
         # Go through the array above and add platforms
         for platform in level:
             block = Platform(platform[0], platform[1])
-            block.player = self.player
+            # block.player = self.player
             self.platform_list.add(block)
+
+
+class Level_02(Level):
+    """ Definition for level 2. """
+
+    def __init__(self, player1, player2):
+        """ Create level 2. """
+
+        # Call the parent constructor
+        Level.__init__(self)
+        self.player_list.add(player1, player2)
+
+
+        # Array with width, height, x, and y of platform
+        level = [[600, 500],
+                 [200, 400],
+                 [700, 300],
+                 [200, 200],
+                 [100, 100],
+                 [600, 100],
+                 [100, 500],
+                 [50, 650],
+                 [600, 650],
+                 [0, 300],
+                 [924, 500],
+                 ]
+
+        # Go through the array above and add platforms
+        for platform in level:
+            block = Platform(platform[0], platform[1])
+            # block.player = self.player
+            self.platform_list.add(block)
+
+        moving_block = MovingPlatform(250, 500)
+        self.platform_list.add(moving_block)
