@@ -140,7 +140,7 @@ class Game:
                 # player_chopper controls
                 if event.key == pg.K_a:
                     self.player_chopper.go_left()
-                if event.key == pg.K_d:
+                elif event.key == pg.K_d:
                     self.player_chopper.go_right()
                 if event.key == pg.K_w:
                     self.player_chopper.jump()

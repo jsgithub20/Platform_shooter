@@ -372,12 +372,12 @@ class Player(pg.sprite.Sprite):
     # Player-controlled movement:
     def go_left(self):
         """ Called when the user hits the left arrow. """
-        self.change_x = -6
+        self.change_x = -self.speed
         self.direction = 'l'
 
     def go_right(self):
         """ Called when the user hits the right arrow. """
-        self.change_x = 6
+        self.change_x = self.speed
         self.direction = 'r'
 
     def stop(self):
