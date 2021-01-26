@@ -64,7 +64,7 @@ class Game:
         # Create all the levels
         self.level_list = []
         self.level_list.append(Level_01(self.player_shooter, self.player_chopper))
-        self.level_list.append(Level_02(self.player_chopper, self.player_chopper))
+        self.level_list.append(Level_02(self.player_shooter, self.player_chopper))
 
         # Set the current level
         self.current_level_no = 1
@@ -448,14 +448,18 @@ class Game:
 
         pg.display.flip()
 
-        pg.time.wait(1000)
-        self.wait_for_key()
+        # pg.time.wait(1000)
+        print(len(pg.event.get()), end="-")
 
+        self.wait_for_key()
         # pg.mixer.music.fadeout(500)
 
     def wait_for_key(self):
         # clear the event queue in case there are anything buffered there
         pg.event.clear()
+        for event in pg.event.get():
+            print(pg.event.event_name(event.type))
+
         waiting = True
         while waiting:
             self.clock.tick(FPS)
@@ -470,7 +474,7 @@ class Game:
 g = Game()
 # g.show_start_screen()
 while g.running:
-    # g.show_select_screen()
+    g.show_select_screen()
     g.new()
     g.show_go_screen()
 
