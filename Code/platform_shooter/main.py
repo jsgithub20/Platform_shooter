@@ -101,7 +101,9 @@ class Game:
             self.events()
             self.update()
             self.draw()
-        pg.mixer.music.unload()
+
+        # music is unloaded in update() when the match is over
+        # pg.mixer.music.unload()
 
     def events(self):
         # Game Loop - events
@@ -327,6 +329,7 @@ class Game:
             pg.display.flip()
 
     def show_select_screen(self):
+
         background = pg.image.load("resources/gui/Window_06.png").convert_alpha()
 
         self.match_score = {"match_type": self.match_types[0], "round": 0, "shooter": 0, "chopper": 0,
