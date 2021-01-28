@@ -40,10 +40,7 @@ class Game:
         # fps display
         self.fps_txt = DrawText(self.screen, 10, WHITE, 25, 0, "fps", "0")
 
-        # match type
-        match_type = self.match_score["match_type"]
-        match_score = str(self.match_score["shooter"]) + " - " + match_type + " - " + str(self.match_score["chopper"])
-        match_type_txt = DrawText(self.screen, 20, WHITE, 25, 720, "match_score", match_score, centered=True)
+
 
         # player score text display
         self.player_shooter_score = DrawText(self.screen, 20, WHITE, 100, 10, "shooter_score", "0")
@@ -52,6 +49,18 @@ class Game:
         # Music and sound effect
         self.snd_yeet = pg.mixer.Sound("resources/sound/yeet.ogg")
         self.snd_yeet.set_volume(0.2)
+
+        pg.mixer.music.load("resources/sound/Resurrection of the Dagger.ogg")
+        pg.mixer.music.set_volume(0.3)
+        pg.mixer.music.play(loops=-1)
+
+        self.restart()
+
+    def restart(self):
+        # match type
+        match_type = self.match_score["match_type"]
+        match_score = str(self.match_score["shooter"]) + " - " + match_type + " - " + str(self.match_score["chopper"])
+        self.match_type_txt = DrawText(self.screen, 20, WHITE, 25, 720, "match_score", match_score, centered=True)
 
         # start a new game
         self.bullets = []
@@ -63,8 +72,6 @@ class Game:
 
         self.player_chopper = sprite_player_correction.Player()
         self.player_chopper.hit_limit = 3
-        # self.player_chopper.image.fill(WHITE)
-        # self.player_chopper.score_text = DrawText(self.screen, 20, WHITE, 800, 10)
 
         # Create all the levels
         self.level_list = []
@@ -85,16 +92,13 @@ class Game:
         self.player_chopper.rect.x = 600
         self.player_chopper.rect.y = 200
 
-        self.active_sprite_list.add(self.player_shooter, self.player_chopper, self.fps_txt, match_type_txt,
+        self.active_sprite_list.add(self.player_shooter, self.player_chopper, self.fps_txt, self.match_type_txt,
                                     self.player_shooter_score, self.player_chopper_score)
 
         self.run()
 
     def run(self):
         # Game Loop
-        pg.mixer.music.load("resources/sound/Resurrection of the Dagger.ogg")
-        pg.mixer.music.set_volume(0.3)
-        pg.mixer.music.play(loops=-1)
         self.playing = True
         while self.playing:
             self.clock.tick(FPS)
@@ -184,7 +188,7 @@ class Game:
                     self.match_score["shooter"] += 1
                     self.winner, self.playing = self.check_winner()
                     if self.winner is None:
-                        self.new()
+                        self.restart()
 
             if pg.sprite.collide_rect(self.player_shooter, self.player_chopper):
                 if self.player_shooter.hit_flag == 0 and self.player_chopper.chop_flag == 1:
@@ -195,7 +199,7 @@ class Game:
                         self.match_score["chopper"] += 1
                         self.winner, self.playing = self.check_winner()
                         if self.winner is None:
-                            self.new()
+                            self.restart()
 
                 elif self.player_shooter.hit_flag == 1 and self.player_chopper.chop_flag == 0:
                     self.player_shooter.hit_flag = 0
@@ -454,6 +458,10 @@ class Game:
             pg.display.flip()
 
     def show_go_screen(self):
+
+        # unload the music playing during game, can change to the music on the go_screen
+        pg.mixer.music.fadeout(500)
+        pg.mixer.music.unload()
         # game over/reset/continue
         if not self.running:
             return
@@ -501,18 +509,6 @@ class Game:
                     exit()
                 if event.type == pg.KEYUP:
                     waiting = False
-
-        # according to pygame document, pygame.fastevent is more proper for multi-threads
-        # pg.fastevent.init()
-        # waiting = True
-        # while waiting:
-        #     self.clock.tick(FPS)
-        #     for event in pg.fastevent.get():
-        #         if event.type == pg.QUIT:
-        #             pg.quit()
-        #             exit()
-        #         if event.type == pg.KEYUP:
-        #             waiting = False
 
 
 g = Game()
