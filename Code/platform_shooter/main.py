@@ -27,6 +27,9 @@ class Game:
         self.match_score = {"match_type": self.match_types[0], "round": 0, "shooter": 0, "chopper": 0,
                             "map": 0, "game_finished": False}
 
+        # the "R" sign on the shooter's head to indicate it's the reloading time, so it can't shoot
+        self.r_sign = DrawText(self.screen, 10, RED, 0, 0, "r_sign", "R", 0, 10)
+
         self.winner = None
         self.running = True
         self.playing = True
@@ -129,7 +132,6 @@ class Game:
                 if event.key == pg.K_SPACE:
                     if self.player_shooter.loaded > 0:
                         self.player_shooter.image_idx = 0
-                        self.player_shooter.reload_timer = pg.time.get_ticks()
                         self.player_shooter.loaded -= 1
                         if self.player_shooter.direction == 'l':
                             bullet = Bullet(self.player_shooter.rect.x, self.player_shooter.rect.y, 'l', SCREEN_WIDTH)
@@ -143,9 +145,6 @@ class Game:
                             self.snd_yeet.play()
                         self.bullets.append(bullet)
                         self.bullet_sprite_grp.add(bullet)
-                    else:
-                        if pg.time.get_ticks() - self.player_shooter.reload_timer >= 4000:
-                            self.player_shooter.loaded = 5
 
                 # player_chopper controls
                 if event.key == pg.K_a:
@@ -176,6 +175,14 @@ class Game:
         # Update the player.
         self.active_sprite_list.update()
         self.bullet_sprite_grp.update()
+
+        # Update the r_sign to follow the player_shooter
+        self.r_sign.rect.midbottom = self.player_shooter.rect.midtop
+        if self.player_shooter.reload_timer > 0 and self.r_sign not in self.active_sprite_list:
+            self.active_sprite_list.add(self.r_sign)
+        elif self.player_shooter.reload_timer == 0 and self.r_sign in self.active_sprite_list:
+            self.active_sprite_list.remove(self.r_sign)
+
         if self.player_chopper in self.active_sprite_list:
             bullet_hit_chopper = pg.sprite.spritecollideany(self.player_chopper, self.bullet_sprite_grp)
             if bullet_hit_chopper:

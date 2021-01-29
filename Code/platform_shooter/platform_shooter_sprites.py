@@ -339,6 +339,16 @@ class Player(pg.sprite.Sprite):
         if self.rect.right < 0:
             self.rect.left = SCREEN_WIDTH
 
+        self.reloading()
+
+    def reloading(self):
+        if self.loaded <= 0:
+            if self.reload_timer == 0:
+                self.reload_timer = pg.time.get_ticks()
+            elif pg.time.get_ticks() - self.reload_timer >= 4000:
+                self.loaded = 5
+                self.reload_timer = 0
+
     def calc_grav(self):
         """ Calculate effect of gravity. """
         if self.change_y == 0:
