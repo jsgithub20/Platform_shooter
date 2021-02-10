@@ -30,6 +30,14 @@ class Game:
         # the "R" sign on the shooter's head to indicate it's the reloading time, so it can't shoot
         self.r_sign = DrawText(self.screen, 10, RED, 0, 0, "r_sign", "R", 0, 10)
 
+        # flag to display or hide mouse location
+        self.mouse_pos_flag = False
+
+        # display the coordinates of the mouse position
+        self.mouse_pos = DrawText(self.screen, 10, LIGHT_BLUE, 0, 730, "mouse_pos", "(0,0)")
+
+        self.fps_txt = DrawText(self.screen, 5, LIGHT_GREEN, 5, 5, "fps_txt", "0")
+
         self.winner = None
         self.running = True
         self.playing = True
@@ -39,11 +47,6 @@ class Game:
             return
         else:
             self.match_score["round"] += 1
-
-        # fps display
-        self.fps_txt = DrawText(self.screen, 10, WHITE, 25, 0, "fps", "0")
-
-
 
         # player score text display
         self.player_shooter_score = DrawText(self.screen, 20, WHITE, 100, 10, "shooter_score", "0")
@@ -122,6 +125,12 @@ class Game:
                 self.running = False
 
             if event.type == pg.KEYDOWN:
+                if event.key == pg.K_F1:
+                    self.mouse_pos_flag = not self.mouse_pos_flag
+                    if self.mouse_pos_flag:
+                        self.active_sprite_list.add(self.mouse_pos)
+                    else:
+                        self.active_sprite_list.remove(self.mouse_pos)
                 # player_shooter controls
                 if event.key == pg.K_LEFT:
                     self.player_shooter.go_left()
@@ -175,6 +184,9 @@ class Game:
         # Update the player.
         self.active_sprite_list.update()
         self.bullet_sprite_grp.update()
+
+        if self.mouse_pos in self.active_sprite_list:
+            self.mouse_pos.text = f"({str(pg.mouse.get_pos()[0])},{str(pg.mouse.get_pos()[1])})"
 
         # Update the r_sign to follow the player_shooter
         self.r_sign.rect.midbottom = self.player_shooter.rect.midtop
@@ -321,6 +333,13 @@ class Game:
                                     waiting = False
 
                 if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_F1:
+                        self.mouse_pos_flag = not self.mouse_pos_flag
+                        if self.mouse_pos_flag:
+                            text_sprites.add(self.mouse_pos)
+                        else:
+                            text_sprites.remove(self.mouse_pos)
+
                     if 32 <= event.key <= 126:
                         for txt in iter(text_sprites):
                             txt.add_letter(event.unicode)
@@ -332,6 +351,9 @@ class Game:
                             txt.back_space()
 
             self.screen.blit(background, (0, 0))
+
+            if self.mouse_pos in text_sprites:
+                self.mouse_pos.text = f"({str(pg.mouse.get_pos()[0])},{str(pg.mouse.get_pos()[1])})"
 
             text_sprites.update()
             text_sprites.draw(self.screen)
@@ -394,12 +416,22 @@ class Game:
         page_idx = 0
         match_idx = 0
         map_idx = 0
+        mouse_pos_grp = pg.sprite.GroupSingle()
         while waiting:
             self.clock.tick(FPS)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     pg.quit()
                     exit()
+
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_F1:
+                        self.mouse_pos_flag = not self.mouse_pos_flag
+                        if self.mouse_pos_flag:
+                            mouse_pos_grp.add(self.mouse_pos)
+                        else:
+                            mouse_pos_grp.remove(self.mouse_pos)
+
                 if event.type == pg.MOUSEBUTTONDOWN:
                     for btn in iter(btn_sprites):
                         if btn.rect.collidepoint(pg.mouse.get_pos()):
@@ -452,15 +484,20 @@ class Game:
 
             self.screen.blit(background, (0, 0))
 
+            if self.mouse_pos in mouse_pos_grp:
+                self.mouse_pos.text = f"({str(pg.mouse.get_pos()[0])},{str(pg.mouse.get_pos()[1])})"
+
             # update role information on the page
             role_lst[page_idx].update()
             match_select.update()
             map_select.update()
+            mouse_pos_grp.update()
 
             role_lst[page_idx].draw(self.screen)
             btn_sprites.draw(self.screen)
             match_select.draw(self.screen)
             map_select.draw(self.screen)
+            mouse_pos_grp.draw(self.screen)
 
             pg.display.flip()
 
@@ -519,7 +556,7 @@ class Game:
 
 
 g = Game()
-# g.show_start_screen()
+g.show_start_screen()
 while g.running:
     g.show_select_screen()
     g.new()
