@@ -1,39 +1,29 @@
-import socket, json
+import socket
+import pickle
 
 
 class Network:
-    def __init__(self):
+    def __init__(self, ip, port):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server = "192.168.3.10"
-        self.port = 5555
+        self.server = ip
+        self.port = int(port)
         self.addr = (self.server, self.port)
-        self.player_pos = (0, 0)
-        self.player_opt = ()
-        self.player_role = ""
-        self.connect()
+        self.p = self.connect()
 
-    #
-    # def getPos(self):
-    #     return self.pos
+    def getP(self):
+        return self.p
 
     def connect(self):
         try:
             self.client.connect(self.addr)
-            self.player_opt = self.client.recv(1024).decode()
-            player_dict = json.loads(self.player_opt)
-            for key, value in player_dict.items():
-                print(key+":"+str(value))
-            selection = input("Please choose your role: ")
-            print(f"Your selection is: {selection}")
-            self.client.sendall(selection.encode())
-            self.player_role = selection
-            self.player_pos = player_dict[selection]
-        except socket.error as e:
-            print(e)
+            return self.client.recv(2048).decode()
+        except:
+            pass
 
     def send(self, data):
         try:
-            self.client.send(data.encode())
-            return self.client.recv(10).decode()
+            self.client.send(str.encode(data))
+            return pickle.loads(self.client.recv(2048*2))
         except socket.error as e:
             print(e)
+
