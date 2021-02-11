@@ -3,17 +3,19 @@ from _thread import *
 import pickle
 from game import Game
 
-server = "10.11.250.207"
-port = 5555
+PORT = 5050
+SERVER = socket.gethostbyname(socket.gethostname())
+print(SERVER)
+ADDR = (SERVER, PORT)
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
-    s.bind((server, port))
+    server.bind(ADDR)
 except socket.error as e:
-    str(e)
+    print(e)
 
-s.listen(2)
+server.listen()
 print("Waiting for a connection, Server Started")
 
 connected = set()
@@ -59,7 +61,7 @@ def threaded_client(conn, p, gameId):
 
 
 while True:
-    conn, addr = s.accept()
+    conn, addr = server.accept()
     print("Connected to:", addr)
 
     idCount += 1
