@@ -7,7 +7,7 @@
     weapon: [pitch]
   identifiers: {}
   keys: 0
-  money: 0
+  money: 5
   name: AA
   save_world_coords: !!python/tuple [5, 5]
   start_coord: !!python/tuple [9, 4]

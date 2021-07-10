@@ -361,7 +361,7 @@ class Player(pg.sprite.Sprite):
             # self.change_y = 0
             self.jump_count = 0
             # self.rect.y = SCREEN_HEIGHT - self.rect.height
-            self.rect.y =  0
+            self.rect.y = 0
 
     def jump(self):
         """ Called when user hits 'jump' button. """
