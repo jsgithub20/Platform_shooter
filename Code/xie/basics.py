@@ -44,38 +44,59 @@ class MovingPlatform(Platform):
 
 
 class XieClass(pg.sprite.Sprite):
-    def __init__(self, file_name, file_num=0):
+    def __init__(self):
         super().__init__()
-        # self.image = pg.image.load(file_name).convert_alpha()
         self.image = run_R[0]
         self.rect = self.image.get_rect()
         self.rect.x = WIDTH / 2
         self.rect.y = 400
-        self.file_num = file_num
         self.speed = 2
         self.img_idx = 0
         self.change_x = 0
         self.change_y = 1
+        self.plat_grp = None
 
     def update(self):
-        if self.file_num == 1:
-            self.rect.x += self.change_x
-            if self.rect.left >= WIDTH:
-                self.rect.right = 0
-            elif self.rect.right <= 0:
-                self.rect.left = WIDTH
+        self.calc_grav()
+        self.rect.y += self.change_y
 
-            self.calc_grav()
+        if self.rect.y > HEIGHT - self.rect.h:
+            self.rect.y = HEIGHT - self.rect.h
 
-            self.rect.y += self.change_y
+        self.collision_y()
 
-            if self.rect.y > HEIGHT - self.rect.h:
-                self.rect.y = HEIGHT - self.rect.h
+        self.rect.x += self.change_x
+        if self.rect.left >= WIDTH:
+            self.rect.right = 0
+        elif self.rect.right <= 0:
+            self.rect.left = WIDTH
 
         if self.change_x < 0:
             self.image = self.chg_frame(run_L)
         elif self.change_x > 0:
             self.image = self.chg_frame(run_R)
+
+        self.collision_x()
+
+    def collision_y(self):
+        hit_blocks = pg.sprite.spritecollide(self, self.plat_grp, False)
+        if hit_blocks:
+            if self.change_y > 0:
+                self.rect.bottom = hit_blocks[0].rect.top
+            elif self.change_y < 0:
+                self.rect.top = hit_blocks[0].rect.bottom
+
+            self.change_y = 0
+
+    def collision_x(self):
+        hit_blocks = pg.sprite.spritecollide(self, self.plat_grp, False)
+        if hit_blocks:
+            if self.change_x > 0:
+                self.rect.right = hit_blocks[0].rect.left
+            elif self.change_x < 0:
+                self.rect.left = hit_blocks[0].rect.right
+
+            self.change_x = 0
 
     def chg_frame(self, img_lst):
         if self.img_idx + 1 == len(img_lst) * 2:
@@ -102,13 +123,16 @@ class XieClass(pg.sprite.Sprite):
 
 
 my_grp = pg.sprite.Group()
-xies = XieClass("idle_1.png", 1)
+xies = XieClass()
 block_1 = Platform(WIDTH/2, HEIGHT/2, 75, 20)
 block_2 = Platform(WIDTH*2/3, HEIGHT*2/3, 75, 20)
-block_m1 = MovingPlatform(WIDTH*1/3, HEIGHT/2, 75, 20)
+block_3 = Platform(WIDTH/4, 720, 75, 20)
+block_m1 = MovingPlatform(WIDTH/3, HEIGHT/2, 75, 20)
 plat_grp = pg.sprite.Group()
-plat_grp.add(block_1, block_2, block_m1)
+plat_grp.add(block_1, block_2, block_3, block_m1)
 my_grp.add(xies)
+
+xies.plat_grp = plat_grp
 
 clock = pg.time.Clock()
 
@@ -135,17 +159,9 @@ while running:
             xies.stop()
 
     # now = xies.rect.x0
-    xies.update()
+    my_grp.update()
     plat_grp.update()
 
-    hit_blocks = pg.sprite.spritecollide(xies, plat_grp, False)
-    if hit_blocks:
-        if xies.change_y > 0:
-            xies.rect.bottom = hit_blocks[0].rect.top
-        elif xies.change_y < 0:
-            xies.rect.top = hit_blocks[0].rect.bottom
-
-        xies.change_y = 0
     # print(xies.rect.x - now)
     screen.fill((100, 200, 100))
     my_grp.draw(screen)
