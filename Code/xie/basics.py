@@ -42,10 +42,11 @@ class MovingPlatform(Platform):
 
         hit_blocks = pg.sprite.spritecollide(self, self.my_grp, False)
         if hit_blocks:
-            if self.change_y > 0:
-                self.rect.bottom = hit_blocks[0].rect.top
-            elif self.change_y < 0:
-                self.rect.top = hit_blocks[0].rect.bottom
+            for hit in hit_blocks:
+                if self.change_y > 0:
+                    hit.rect.top = self.rect.bottom
+                elif self.change_y < 0:
+                    hit.rect.bottom = self.rect.top
 
         if self.rect.top < self.boundary_top or self.rect.bottom > self.boundary_bottom:
             self.change_y *= -1
@@ -132,16 +133,18 @@ class XieClass(pg.sprite.Sprite):
 
 my_grp = pg.sprite.Group()
 xies = XieClass()
+poirot = XieClass()
 block_1 = Platform(WIDTH/2, HEIGHT/2, 75, 20)
 block_2 = Platform(WIDTH*2/3, HEIGHT*2/3, 75, 20)
 block_3 = Platform(WIDTH/4, 720, 75, 20)
 block_m1 = MovingPlatform(WIDTH/3, HEIGHT/2, 75, 20)
 plat_grp = pg.sprite.Group()
 plat_grp.add(block_1, block_2, block_3, block_m1)
-my_grp.add(xies)
+my_grp.add(xies, poirot)
 block_m1.my_grp = my_grp
 
 xies.plat_grp = plat_grp
+poirot.plat_grp = plat_grp
 
 clock = pg.time.Clock()
 
@@ -163,6 +166,13 @@ while running:
                 xies.go_right()
             if event.key == pg.K_UP:
                 xies.jump()
+            if event.key == pg.K_a:
+                poirot.go_left()
+            if event.key == pg.K_d:
+                poirot.go_right()
+            if event.key == pg.K_w:
+                poirot.jump()
+
 
         if event.type == pg.KEYUP:
             xies.stop()
