@@ -35,9 +35,17 @@ class MovingPlatform(Platform):
         self.change_y = 1
         self.boundary_top = 100
         self.boundary_bottom = 600
+        self.my_grp = None  # block_m1.my_grp = my_grp
 
     def update(self):
         self.rect.y += self.change_y
+
+        hit_blocks = pg.sprite.spritecollide(self, self.my_grp, False)
+        if hit_blocks:
+            if self.change_y > 0:
+                self.rect.bottom = hit_blocks[0].rect.top
+            elif self.change_y < 0:
+                self.rect.top = hit_blocks[0].rect.bottom
 
         if self.rect.top < self.boundary_top or self.rect.bottom > self.boundary_bottom:
             self.change_y *= -1
@@ -131,6 +139,7 @@ block_m1 = MovingPlatform(WIDTH/3, HEIGHT/2, 75, 20)
 plat_grp = pg.sprite.Group()
 plat_grp.add(block_1, block_2, block_3, block_m1)
 my_grp.add(xies)
+block_m1.my_grp = my_grp
 
 xies.plat_grp = plat_grp
 

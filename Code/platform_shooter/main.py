@@ -18,7 +18,7 @@ class Game:
 
         # map list
         self.map_list = [0, 1]
-        self.current_level_no = 0
+        self.current_level_no = 1
 
         # match types
         self.match_types = ["Deathmatch", "1st23", "Best of 3"]
