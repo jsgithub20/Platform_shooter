@@ -19,6 +19,22 @@ screen = pg.display.set_mode((WIDTH, HEIGHT))
 pg.display.set_caption("pygame basicssssss")
 
 
+class Bullet(pg.sprite.Sprite):
+    def __init__(self, pos_x, pos_y, direction, screen_width):
+        super().__init__()
+        self.image = pg.Surface((10, 10))
+        self.image.fill((255, 255, 255))
+        self.rect = self.image.get_rect()
+        self.rect.x = pos_x
+        self.rect.y = pos_y
+        self.direction = direction
+        self.screen_width = screen_width
+        self.speed = 10
+
+    def update(self):
+        self.rect.x += self.speed
+
+
 class Platform(pg.sprite.Sprite):
     def __init__(self, x, y, w, h):
         super().__init__()
@@ -64,6 +80,7 @@ class XieClass(pg.sprite.Sprite):
         self.change_x = 0
         self.change_y = 1
         self.plat_grp = None
+        self.direction = "r"
 
     def update(self):
         self.calc_grav()
@@ -81,8 +98,10 @@ class XieClass(pg.sprite.Sprite):
             self.rect.left = WIDTH
 
         if self.change_x < 0:
+            self.direction = "l"
             self.image = self.chg_frame(run_L)
         elif self.change_x > 0:
+            self.direction = "r"
             self.image = self.chg_frame(run_R)
 
         self.collision_x()
@@ -125,6 +144,8 @@ class XieClass(pg.sprite.Sprite):
         self.change_x = 0
 
     def calc_grav(self):
+        if self.change_y == 0:
+            self.change_y = 1
         self.change_y += 0.35
 
     def jump(self):
@@ -134,17 +155,20 @@ class XieClass(pg.sprite.Sprite):
 my_grp = pg.sprite.Group()
 xies = XieClass()
 poirot = XieClass()
+my_grp.add(xies, poirot)
+
 block_1 = Platform(WIDTH/2, HEIGHT/2, 75, 20)
 block_2 = Platform(WIDTH*2/3, HEIGHT*2/3, 75, 20)
 block_3 = Platform(WIDTH/4, 720, 75, 20)
 block_m1 = MovingPlatform(WIDTH/3, HEIGHT/2, 75, 20)
+block_m1.my_grp = my_grp
 plat_grp = pg.sprite.Group()
 plat_grp.add(block_1, block_2, block_3, block_m1)
-my_grp.add(xies, poirot)
-block_m1.my_grp = my_grp
 
 xies.plat_grp = plat_grp
 poirot.plat_grp = plat_grp
+
+bullet_grp = pg.sprite.Group()
 
 clock = pg.time.Clock()
 
@@ -166,6 +190,9 @@ while running:
                 xies.go_right()
             if event.key == pg.K_UP:
                 xies.jump()
+            if event.key == pg.K_SPACE:
+                bullet = Bullet(xies.rect.x, xies.rect.y, xies.direction, WIDTH)
+                bullet_grp.add(bullet)
             if event.key == pg.K_a:
                 poirot.go_left()
             if event.key == pg.K_d:
@@ -173,18 +200,22 @@ while running:
             if event.key == pg.K_w:
                 poirot.jump()
 
-
         if event.type == pg.KEYUP:
-            xies.stop()
+            if event.key == pg.K_LEFT or event.key == pg.K_RIGHT:
+                xies.stop()
+            if event.key == pg.K_a or event.key == pg.K_d:
+                poirot.stop()
 
     # now = xies.rect.x0
     my_grp.update()
     plat_grp.update()
+    bullet_grp.update()
 
     # print(xies.rect.x - now)
     screen.fill((100, 200, 100))
     my_grp.draw(screen)
     plat_grp.draw(screen)
+    bullet_grp.draw(screen)
     pg.display.update()
 
 pg.quit()
