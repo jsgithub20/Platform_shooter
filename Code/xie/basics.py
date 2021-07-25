@@ -27,12 +27,18 @@ class Bullet(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = pos_x
         self.rect.y = pos_y
-        self.direction = direction
         self.screen_width = screen_width
         self.speed = 10
+        if direction == "l":
+            self.speed = -self.speed
 
     def update(self):
         self.rect.x += self.speed
+
+        if self.rect.x > self.screen_width:
+            self.rect.x = 0
+        elif self.rect.x < 0:
+            self.rect.x = self.screen_width
 
 
 class Platform(pg.sprite.Sprite):

@@ -192,7 +192,7 @@ class Bullet(pg.sprite.Sprite):
         self.loop_count = 0
         self.level = None
         if self.direction == 'l':
-            self.imag = pg.transform.flip(self.image, True, False)
+            self.image = pg.transform.flip(self.image, True, False)
             self.speed = -self.speed
 
     def update(self):
