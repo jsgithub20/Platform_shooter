@@ -29,6 +29,8 @@ class Bullet(pg.sprite.Sprite):
         self.rect.y = pos_y
         self.screen_width = screen_width
         self.speed = 10
+        self.live_flag = 1
+        self.loop_count = 0
         if direction == "l":
             self.speed = -self.speed
 
@@ -37,8 +39,13 @@ class Bullet(pg.sprite.Sprite):
 
         if self.rect.x > self.screen_width:
             self.rect.x = 0
+            self.loop_count += 1
         elif self.rect.x < 0:
             self.rect.x = self.screen_width
+            self.loop_count += 1
+
+        if self.loop_count >= 2:
+            self.live_flag = 0
 
 
 class Platform(pg.sprite.Sprite):
@@ -175,6 +182,7 @@ xies.plat_grp = plat_grp
 poirot.plat_grp = plat_grp
 
 bullet_grp = pg.sprite.Group()
+bullet_lst = []
 
 clock = pg.time.Clock()
 
@@ -199,6 +207,7 @@ while running:
             if event.key == pg.K_SPACE:
                 bullet = Bullet(xies.rect.x, xies.rect.y, xies.direction, WIDTH)
                 bullet_grp.add(bullet)
+                bullet_lst.append(bullet)
             if event.key == pg.K_a:
                 poirot.go_left()
             if event.key == pg.K_d:
@@ -212,7 +221,12 @@ while running:
             if event.key == pg.K_a or event.key == pg.K_d:
                 poirot.stop()
 
-    # now = xies.rect.x0
+    if bullet_lst:
+        for bullet in bullet_lst:
+            if not bullet.live_flag:
+                bullet_lst.remove(bullet)
+                bullet_grp.remove(bullet)
+
     my_grp.update()
     plat_grp.update()
     bullet_grp.update()
