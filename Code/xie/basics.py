@@ -19,6 +19,20 @@ screen = pg.display.set_mode((WIDTH, HEIGHT))
 pg.display.set_caption("pygame basicssssss")
 
 
+class DrawText(pg.sprite.Sprite):
+    def __init__(self, text, pos_x, pos_y):
+        super().__init__()
+        self.my_font = pg.font.SysFont("arial", 30)
+        self.text = text
+        self.image = self.my_font.render(self.text, True, (255, 255, 255))
+        self.rect = self.image.get_rect()
+        self.rect.x = pos_x
+        self.rect.y = pos_y
+
+    def update(self):
+        self.image = self.my_font.render(self.text, True, (255, 255, 255))
+
+
 class Bullet(pg.sprite.Sprite):
     def __init__(self, pos_x, pos_y, direction, screen_width):
         super().__init__()
@@ -184,6 +198,10 @@ poirot.plat_grp = plat_grp
 bullet_grp = pg.sprite.Group()
 bullet_lst = []
 
+fps_txt = DrawText("0", 0, 0)
+
+txt_grp = pg.sprite.GroupSingle(fps_txt)
+
 clock = pg.time.Clock()
 
 running = True
@@ -227,15 +245,18 @@ while running:
                 bullet_lst.remove(bullet)
                 bullet_grp.remove(bullet)
 
+    fps_txt.text = str(clock.get_fps())
     my_grp.update()
     plat_grp.update()
     bullet_grp.update()
+    txt_grp.update()
 
     # print(xies.rect.x - now)
     screen.fill((100, 200, 100))
     my_grp.draw(screen)
     plat_grp.draw(screen)
     bullet_grp.draw(screen)
+    txt_grp.draw(screen)
     pg.display.update()
 
 pg.quit()
