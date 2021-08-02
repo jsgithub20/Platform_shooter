@@ -108,6 +108,7 @@ class XieClass(pg.sprite.Sprite):
         self.change_y = 1
         self.plat_grp = None
         self.direction = "r"
+        self.score = 0
 
     def update(self):
         self.calc_grav()
@@ -239,17 +240,23 @@ while running:
             if event.key == pg.K_a or event.key == pg.K_d:
                 poirot.stop()
 
+    fps_txt.text = f"FPS: {clock.get_fps():4.1f}, FPS = Frame Per Second"
+    my_grp.update()
+    plat_grp.update()
+    bullet_grp.update()
+    txt_grp.update()
+
+    bullet_hit_poirot = pg.sprite.spritecollideany(poirot, bullet_grp)
+    if bullet_hit_poirot:
+        bullet_hit_poirot.live_flag = 0
+        xies.score += 1
+        print(xies.score)
+
     if bullet_lst:
         for bullet in bullet_lst:
             if not bullet.live_flag:
                 bullet_lst.remove(bullet)
                 bullet_grp.remove(bullet)
-
-    fps_txt.text = str(clock.get_fps())
-    my_grp.update()
-    plat_grp.update()
-    bullet_grp.update()
-    txt_grp.update()
 
     # print(xies.rect.x - now)
     screen.fill((100, 200, 100))

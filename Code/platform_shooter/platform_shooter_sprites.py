@@ -41,6 +41,8 @@ idle_girl = [pg.image.load("resources/gui/girl/Idle__000.png"), pg.image.load("r
              pg.image.load("resources/gui/girl/Idle__006.png"), pg.image.load("resources/gui/girl/Idle__007.png"),
              pg.image.load("resources/gui/girl/Idle__008.png"), pg.image.load("resources/gui/girl/Idle__009.png")]
 
+
+
 idle_boy = [pg.image.load("resources/gui/boy/Idle__000.png"), pg.image.load("resources/gui/boy/Idle__001.png"),
              pg.image.load("resources/gui/boy/Idle__002.png"), pg.image.load("resources/gui/boy/Idle__003.png"),
              pg.image.load("resources/gui/boy/Idle__004.png"), pg.image.load("resources/gui/boy/Idle__005.png"),
