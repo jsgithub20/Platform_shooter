@@ -183,6 +183,7 @@ class XieClass(pg.sprite.Sprite):
 my_grp = pg.sprite.Group()
 xies = XieClass()
 poirot = XieClass()
+poirot.rect.x = 400
 my_grp.add(xies, poirot)
 
 block_1 = Platform(WIDTH/2, HEIGHT/2, 75, 20)
@@ -250,13 +251,17 @@ while running:
     if bullet_hit_poirot:
         bullet_hit_poirot.live_flag = 0
         xies.score += 1
-        print(xies.score)
+        print(f"xies scores! total = {xies.score}")
 
     if bullet_lst:
         for bullet in bullet_lst:
             if not bullet.live_flag:
                 bullet_lst.remove(bullet)
                 bullet_grp.remove(bullet)
+
+    if pg.sprite.collide_rect(xies, poirot):
+        poirot.score += 1
+        print(f"poirot scores! total = {poirot.score}")
 
     # print(xies.rect.x - now)
     screen.fill((100, 200, 100))
