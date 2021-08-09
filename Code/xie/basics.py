@@ -109,6 +109,7 @@ class XieClass(pg.sprite.Sprite):
         self.plat_grp = None
         self.direction = "r"
         self.score = 0
+        self.chop_flag = 0
 
     def update(self):
         self.calc_grav()
@@ -234,6 +235,8 @@ while running:
                 poirot.go_right()
             if event.key == pg.K_w:
                 poirot.jump()
+            if event.key == pg.K_c:
+                poirot.chop_flag = 1
 
         if event.type == pg.KEYUP:
             if event.key == pg.K_LEFT or event.key == pg.K_RIGHT:
@@ -260,8 +263,10 @@ while running:
                 bullet_grp.remove(bullet)
 
     if pg.sprite.collide_rect(xies, poirot):
-        poirot.score += 1
-        print(f"poirot scores! total = {poirot.score}")
+        if poirot.chop_flag == 1:
+            poirot.chop_flag = 0
+            poirot.score += 1
+            print(f"poirot scores! total = {poirot.score}")
 
     # print(xies.rect.x - now)
     screen.fill((100, 200, 100))

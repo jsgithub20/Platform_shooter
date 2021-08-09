@@ -558,8 +558,8 @@ class Game:
 g = Game()
 # g.show_start_screen()
 while g.running:
-    g.show_select_screen()
+    # g.show_select_screen()
     g.new()
-    g.show_go_screen()
+    # g.show_go_screen()
 
 pg.quit()
