@@ -1,10 +1,6 @@
 import pygame as pg
-import settings
+from settings import *
 import SI_Sprites
-
-WIDTH = 1024
-HEIGHT = 768
-TITLE = "SPACE INVADERS"
 
 
 class Game:
@@ -13,6 +9,7 @@ class Game:
         pg.mixer.init()
         self.background = pg.image.load("background.png")
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
+        self.screen.blit(self.background, (0, 0))
         pg.display.set_caption(TITLE)
         self.clock = pg.time.Clock()
         self.running = True
@@ -35,7 +32,7 @@ class Game:
 
         for i in range(self.level_0_enemy):
             enemy = SI_Sprites.Enemy()
-            enemy.rect.x = (settings.WIDTH / self.level_0_enemy) * i
+            enemy.rect.x = (WIDTH / self.level_0_enemy) * i
             enemy.rect.y = 10
             self.enemy_grp.add(enemy)
 
@@ -44,7 +41,7 @@ class Game:
     def run(self):
         self.running = True
         while self.running:
-            self.clock.tick(settings.FPS)
+            self.clock.tick(FPS)
             self.events()
             self.update()
             self.draw()
@@ -59,10 +56,13 @@ class Game:
 
     def update(self):
         self.enemy_grp.update()
+        self.player_grp.update()
 
     def draw(self):
         self.screen.blit(self.background, (0, 0))
         self.enemy_grp.draw(self.screen)
+        self.player_grp.draw(self.screen)
+        pg.display.update()
 
     def start_screen(self):
         pass

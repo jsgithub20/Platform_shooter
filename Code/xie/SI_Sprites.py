@@ -1,5 +1,5 @@
 import pygame as pg
-import settings
+from settings import *
 
 
 class Enemy(pg.sprite.Sprite):
@@ -12,7 +12,7 @@ class Enemy(pg.sprite.Sprite):
     def update(self):
         self.rect.x += self.speed
 
-        if self.rect.right >= settings.WIDTH:
+        if self.rect.right >= WIDTH:
             self.rect.y += (self.rect.h + 2)
             self.speed *= -1
         elif self.rect.left <= 0:
@@ -25,8 +25,8 @@ class Player(pg.sprite.Sprite):
         super().__init__()
         self.image = pg.image.load("player.png").convert_alpha()
         self.rect = self.image.get_rect()
-        self.rect.bottom = settings.HEIGHT
-        self.rect.x = settings.WIDTH / 2
+        self.rect.bottom = HEIGHT
+        self.rect.x = WIDTH / 2
         self.speed = 2
         self.change_x = 0
         self.change_y = 0
@@ -34,8 +34,8 @@ class Player(pg.sprite.Sprite):
     def update(self):
         self.rect.x += self.change_x
 
-        if self.rect.right >= settings.WIDTH:
-            self.rect.right = settings.WIDTH
+        if self.rect.right >= WIDTH:
+            self.rect.right = WIDTH
         elif self.rect.left <= 0:
             self.rect.left = 0
 
@@ -49,7 +49,7 @@ class Player(pg.sprite.Sprite):
         self.change_x = 0
 
     def go_home(self):
-        self.rect.bottom = settings.HEIGHT
-        self.rect.x = settings.WIDTH / 2
+        self.rect.bottom = HEIGHT
+        self.rect.x = WIDTH / 2
 
 
