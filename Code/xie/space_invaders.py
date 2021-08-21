@@ -38,9 +38,9 @@ class Game:
 
 
 g = Game()
-g.start_screen()
+# g.start_screen()
 while g.running:
     g.new()
-    g.game_end()
+    # g.game_end()
 
 pg.quit()

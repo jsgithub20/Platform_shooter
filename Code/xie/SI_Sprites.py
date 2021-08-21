@@ -2,6 +2,19 @@ import pygame as pg
 from settings import *
 
 
+class Bullets(pg.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pg.image.load("bullet.png").convert_alpha()
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.speed = 10
+
+    def update(self):
+        self.rect.y -= self.speed
+
+
 class Enemy(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -30,6 +43,7 @@ class Player(pg.sprite.Sprite):
         self.speed = 2
         self.change_x = 0
         self.change_y = 0
+        self.direction = "L"
 
     def update(self):
         self.rect.x += self.change_x
@@ -41,9 +55,11 @@ class Player(pg.sprite.Sprite):
 
     def go_left(self):
         self.change_x = -self.speed
+        self.direction = "L"
 
     def go_right(self):
         self.change_x = self.speed
+        self.direction = "R"
 
     def stop(self):
         self.change_x = 0
