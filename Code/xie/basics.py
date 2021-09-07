@@ -1,4 +1,5 @@
 import pygame as pg
+from random import randint
 
 WIDTH = 1024
 HEIGHT = 768
@@ -28,9 +29,24 @@ class DrawText(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = pos_x
         self.rect.y = pos_y
+        self.moved_x = 0
+        self.moved_y = 0
+        self.angle = 0
+        self.move_flag = 0
 
     def update(self):
+        if self.move_flag:
+            self.move_flag = 0
+            self.moved_x = randint(100, (WIDTH - 100))
+            self.moved_y = randint(100, (HEIGHT - 100))
+            self.angle = randint(-45, 45)
         self.image = self.my_font.render(self.text, True, (255, 255, 255))
+        self.image = pg.transform.rotate(self.image, self.angle)
+        self.rect.x = self.moved_x
+        self.rect.y = self.moved_y
+
+    def move(self):
+        self.move_flag = 1
 
 
 class Bullet(pg.sprite.Sprite):
@@ -201,9 +217,12 @@ poirot.plat_grp = plat_grp
 bullet_grp = pg.sprite.Group()
 bullet_lst = []
 
-fps_txt = DrawText("0", 0, 0)
+# fps_txt = DrawText("0", 0, 0)
 
-txt_grp = pg.sprite.GroupSingle(fps_txt)
+txt_grp = pg.sprite.Group()
+for i in range(5):
+    fps_txt = DrawText("0", 0, 0)
+    txt_grp.add(fps_txt)
 
 clock = pg.time.Clock()
 
@@ -237,6 +256,9 @@ while running:
                 poirot.jump()
             if event.key == pg.K_c:
                 poirot.chop_flag = 1
+            if event.key == pg.K_r:
+                for fps_txt in iter(txt_grp):
+                    fps_txt.move()
 
         if event.type == pg.KEYUP:
             if event.key == pg.K_LEFT or event.key == pg.K_RIGHT:
@@ -244,7 +266,10 @@ while running:
             if event.key == pg.K_a or event.key == pg.K_d:
                 poirot.stop()
 
-    fps_txt.text = f"FPS: {clock.get_fps():4.1f}, FPS = Frame Per Second"
+    for fps_txt in iter(txt_grp):
+        fps_txt.text = f"FPS: {clock.get_fps():4.1f}, FPS = Frame Per Second"
+
+    # fps_txt.text = f"FPS: {clock.get_fps():4.1f}, FPS = Frame Per Second"
     my_grp.update()
     plat_grp.update()
     bullet_grp.update()

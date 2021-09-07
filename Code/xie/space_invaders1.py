@@ -1,6 +1,8 @@
 import pygame as pg
 from settings import *
 import SI_Sprites
+from pythonWordArt import pyWordArt
+
 
 
 class Game:
@@ -37,6 +39,13 @@ class Game:
             enemy.rect.x = (WIDTH / self.level_0_enemy) * i
             enemy.rect.y = 10
             self.enemy_grp.add(enemy)
+
+        w = pyWordArt()
+        w.transparentBackground = True
+        w.noOpenGL = False
+        w.WordArt("Text here", w.Styles["rainbow"], "100")
+        w.toFile("w_test")
+        print("file saved.")
 
         self.run()
 
